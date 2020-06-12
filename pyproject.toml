@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "redtrio"
+version = "0.1.0"
+description = "An async (Trio) client for Redis 6+"
+authors = ["Harrison Morgan <harrison.morgan@gmail.com>"]
+license = "bsd-3-clause"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+trio = "~=0.16"
+
+[tool.poetry.dev-dependencies]
+black = "^19.10b0"
+mypy = "^0.780"
+pytest = "^5.4.3"
+pytest-trio = "^0.6.0"
+coverage = {extras = ["toml"], version = "^5.1"}
+pytest-cov = "^2.10.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
