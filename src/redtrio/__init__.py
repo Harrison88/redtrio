@@ -1,1 +1,6 @@
-__version__ = '0.1.0'
+from importlib import metadata
+
+try:
+    __version__ = metadata.version(__name__)
+except:
+    __version__ = "unknown"
