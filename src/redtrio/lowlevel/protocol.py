@@ -11,7 +11,7 @@ class Resp3Reader:
         self.sentinel = object()
         self.current_object = self.sentinel
         self._state = None
-        self.state_stack = []
+        self.state_stack: t.List[dict] = []
         self.object_stack = []
 
         self.types = {
@@ -22,10 +22,10 @@ class Resp3Reader:
             ord("*"): self.parse_array,
         }
 
-    def feed(self, data):
+    def feed(self, data: bytes):
         self._buffer.extend(data)
 
-    def eat(self, num_bytes: int, state=None) -> t.Optional[bytearray]:
+    def eat(self, num_bytes: int, state: t.Optional[dict] = None) -> bytearray:
         if state:
             self.state_stack.append(state)
         if len(self._buffer) < num_bytes:
@@ -36,7 +36,7 @@ class Resp3Reader:
         del self._buffer[:num_bytes]
         return data
 
-    def eat_linebreak(self, state=None):
+    def eat_linebreak(self, state: t.Optional[dict] = None) -> bytearray:
         linebreak = b"\r\n"
 
         if state:
@@ -50,13 +50,13 @@ class Resp3Reader:
         data = self.eat(index + 2)
         return data[:-2]
 
-    def get_object(self):
+    def get_object(self) -> t.Any:
         try:
             return self.parse(check_state=True)
         except NotEnoughDataError:
             return False
 
-    def parse(self, check_state=False, state=None):
+    def parse(self, check_state: bool = False, state: t.Optional[dict] = None):
         if check_state and self.state_stack:
             state = self.state_stack.pop()
             return state["function"](state=state)
@@ -65,7 +65,7 @@ class Resp3Reader:
         object_parser = self.types[ord(object_type)]
         return object_parser()
 
-    def parse_map(self, state=None):
+    def parse_map(self, state: t.Optional[dict] = None):
         READ_KEY_NAME = "read_key"
         READ_VALUE = "read_value"
 
@@ -89,12 +89,12 @@ class Resp3Reader:
 
         return state["object"]
 
-    def parse_simple_string(self, state=None):
+    def parse_simple_string(self, state: t.Optional[dict] = None):
         state = {"function": self.parse_simple_string}
         line = self.eat_linebreak(state=state)
         return line.decode()
 
-    def parse_blob(self, state=None):
+    def parse_blob(self, state: t.Optional[dict] = None):
         if state is None:
             state = {"function": self.parse_blob}
 
@@ -105,12 +105,12 @@ class Resp3Reader:
         self.eat(2, state=state)  # Discard the line break after the data
         return bytes(state["object"])
 
-    def parse_number(self, state=None):
+    def parse_number(self, state: t.Optional[dict] = None):
         state = {"function": self.parse_number}
         line = self.eat_linebreak(state=state)
         return int(line)
 
-    def parse_array(self, state=None):
+    def parse_array(self, state: t.Optional[dict] = None):
         if state is None:
             state = {"function": self.parse_array, "object": []}
 
@@ -123,7 +123,7 @@ class Resp3Reader:
         return state["object"]
 
 
-def write_command(command, *args):
+def write_command(command: bytes, *args: bytes) -> bytes:
     length = len(args) + 1
 
     packed_command = b"*%(num_args)d\r\n$%(command_length)d\r\n%(command)b\r\n" % {

@@ -1,3 +1,5 @@
+import typing as t
+
 import trio
 
 
@@ -15,7 +17,7 @@ class RedisConnection:
         self.socket = await trio.open_tcp_stream(self.host, self.port)
         return True
 
-    async def send(self, data):
+    async def send(self, data: bytes):
         await self.socket.send_all(data)
         return True
 
@@ -30,14 +32,18 @@ class RedisConnection:
 
 class ConnectionPool:
     def __init__(
-        self, host, port, max_connections=50, spawn_connection=trio.open_tcp_stream
+        self,
+        host: str,
+        port: int,
+        max_connections: int = 50,
+        spawn_connection: t.Callable = trio.open_tcp_stream,
     ):
         self.host = host
         self.port = port
         self.max_connections = max_connections
         self.spawn_connection = spawn_connection
-        self.used_connections = set()
-        self.pool = []
+        self.used_connections: t.Set[trio.abc.Stream] = set()
+        self.pool: t.List[trio.abc.Stream] = []
 
     async def wait_for_connection(self):
         connection = None
@@ -54,11 +60,11 @@ class ConnectionPool:
         self.used_connections.add(connection)
         return connection
 
-    def put_connection(self, connection):
+    def put_connection(self, connection: trio.abc.Stream):
         self.used_connections.remove(connection)
         self.pool.append(connection)
 
-    def remove_connection(self, connection):
+    def remove_connection(self, connection: trio.abc.Stream):
         self.used_connections.discard(connection)
         if connection in self.pool:
             self.pool.remove(connection)

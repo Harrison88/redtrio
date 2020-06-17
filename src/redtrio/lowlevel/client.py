@@ -1,3 +1,5 @@
+import typing as t
+
 import trio
 
 from . import connections
@@ -7,12 +9,12 @@ from . import protocol
 class RedisClient:
     def __init__(
         self,
-        host="127.0.0.1",
-        port=6379,
+        host: str = "127.0.0.1",
+        port: int = 6379,
         *,
         connection_pool=None,
-        Reader=protocol.Resp3Reader,
-        write_command=protocol.write_command,
+        Reader: type = protocol.Resp3Reader,
+        write_command: t.Callable = protocol.write_command,
     ):
         self.host = host
         self.port = port
@@ -25,7 +27,7 @@ class RedisClient:
         self.reader = Reader()
         self.write_command = write_command
 
-    async def call(self, command, *args):
+    async def call(self, command: bytes, *args: bytes):
         buffer = self.write_command(command, *args)
         connection = await self.connection_pool.wait_for_connection()
         await connection.send_all(buffer)
