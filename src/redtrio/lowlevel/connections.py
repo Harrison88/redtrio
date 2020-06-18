@@ -3,33 +3,6 @@ import typing as t
 import trio
 
 
-class RedisConnection:
-    def __init__(self, host, port, *, pool=None):
-        self.socket = None
-        self.host = host
-        self.port = port
-        self.pool = pool
-
-    async def connect(self):
-        if self.socket:
-            return True
-
-        self.socket = await trio.open_tcp_stream(self.host, self.port)
-        return True
-
-    async def send(self, data: bytes):
-        await self.socket.send_all(data)
-        return True
-
-    async def receive(self):
-        pass
-
-    def close(self):
-        if self.pool:
-            self.pool.remove_connection(self)
-        self.socket = None
-
-
 class ConnectionPool:
     def __init__(
         self,
