@@ -28,4 +28,4 @@ def test_use_connection_pool():
 async def test_parse_streamed_data(autojump_clock, nursery, client, trickle_connection):
     client.connection_pool.pool.append(trickle_connection)
     result = await client.call(b"PING")
-    assert result == "PONG"
+    assert result == b"PONG"

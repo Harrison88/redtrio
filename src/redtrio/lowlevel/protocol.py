@@ -92,7 +92,7 @@ class Resp3Reader:
     def parse_simple_string(self, state: t.Optional[dict] = None):
         state = {"function": self.parse_simple_string}
         line = self.eat_linebreak(state=state)
-        return line.decode()
+        return line
 
     def parse_blob(self, state: t.Optional[dict] = None):
         if state is None:
