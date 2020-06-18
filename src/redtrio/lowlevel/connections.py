@@ -23,8 +23,7 @@ class ConnectionPool:
         while not connection:
             if self.pool:
                 connection = self.pool.pop()
-                break
-            if len(self.used_connections) + len(self.pool) < self.max_connections:
+            elif len(self.used_connections) + len(self.pool) < self.max_connections:
                 connection = await self.spawn_connection(self.host, self.port)
                 break
 
