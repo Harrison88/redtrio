@@ -101,7 +101,9 @@ class Resp3Reader:
         if "length" not in state:
             state["length"] = int(self.eat_linebreak(state=state))
 
-        state["object"] = self.eat(state["length"], state=state)
+        if "object" not in state:
+            state["object"] = self.eat(state["length"], state=state)
+
         self.eat(2, state=state)  # Discard the line break after the data
         return bytes(state["object"])
 
