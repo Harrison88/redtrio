@@ -56,14 +56,25 @@ class Resp3Reader:
         except NotEnoughDataError:
             return False
 
-    def parse(self, check_state: bool = False, state: t.Optional[dict] = None):
+    def parse(self, check_state: bool = True, state: t.Optional[dict] = None):
         if check_state and self.state_stack:
-            state = self.state_stack.pop()
-            return state["function"](state=state)
+            checked_state = self.state_stack.pop(0)
+            if state:
+                self.state_stack.append(state)
+            result = checked_state["function"](state=checked_state)
+            if state:
+                self.state_stack.pop()
+            return result
 
         object_type = self.eat(1, state=state)
+
+        if state:
+            self.state_stack.append(state)
         object_parser = self.types[ord(object_type)]
-        return object_parser()
+        result = object_parser()
+        if state:
+            self.state_stack.pop()
+        return result
 
     def parse_map(self, state: t.Optional[dict] = None):
         READ_KEY_NAME = "read_key"
