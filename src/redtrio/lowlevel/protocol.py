@@ -36,15 +36,13 @@ class Resp3Reader:
         del self._buffer[:num_bytes]
         return data
 
-    def eat_linebreak(self, state: t.Optional[dict] = None) -> bytearray:
+    def eat_linebreak(self, state: dict) -> bytearray:
         linebreak = b"\r\n"
 
-        if state:
-            self.state_stack.append(state)
+        self.state_stack.append(state)
         if linebreak not in self._buffer:
             raise NotEnoughDataError
-        if state:
-            self.state_stack.pop()
+        self.state_stack.pop()
 
         index = self._buffer.index(linebreak)
         data = self.eat(index + 2)
@@ -93,7 +91,7 @@ class Resp3Reader:
                 state["next_key_name"] = key_name
                 state["action"] = READ_VALUE
 
-            if state["action"] is READ_VALUE:
+            else:
                 name = state["next_key_name"]
                 state["object"][name] = self.parse(state=state)
                 state["action"] = READ_KEY_NAME

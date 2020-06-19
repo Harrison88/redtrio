@@ -27,4 +27,14 @@ redis_commands = {
         "response": b"$3\r\nbar\r\n",
         "response_value": b"bar",
     },
+    b"MSET language Python version 3": {
+        "encoded": b"*5\r\n$4\r\nMSET\r\n$8\r\nlanguage\r\n$6\r\nPython\r\n$7\r\nversion\r\n$1\r\n3\r\n",
+        "response": b"+OK\r\n",
+        "response_value": b"OK",
+    },
+    b"MGET language version": {
+        "encoded": b"*3\r\n$4\r\nMGET\r\n$8\r\nlanguage\r\n$7\r\nversion\r\n",
+        "response": b"*2\r\n$6\r\nPython\r\n$1\r\n3\r\n",
+        "response_value": [b"Python", b"3"],
+    },
 }
