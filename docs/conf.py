@@ -10,3 +10,4 @@ extensions = [
 
 autoapi_type = "python"
 autoapi_dirs = ["../src"]
+autoapi_template_dir = "_autoapi_templates"
