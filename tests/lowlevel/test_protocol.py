@@ -1,7 +1,6 @@
 import pytest
 
 from redtrio.lowlevel import protocol
-
 from ..redis_commands import redis_commands
 
 

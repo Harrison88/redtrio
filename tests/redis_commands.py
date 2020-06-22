@@ -1,3 +1,4 @@
+# flake8: noqa
 redis_commands = {
     b"HELLO 3": {
         "encoded": b"*2\r\n$5\r\nHELLO\r\n$1\r\n3\r\n",

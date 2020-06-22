@@ -1,10 +1,7 @@
-from functools import partial
-
 import pytest
-import trio
 
-from redtrio.lowlevel import RedisClient
 from redtrio.lowlevel import connections
+from redtrio.lowlevel import RedisClient
 
 
 @pytest.fixture

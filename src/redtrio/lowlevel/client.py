@@ -1,7 +1,5 @@
 import typing as t
 
-import trio
-
 from . import connections
 from . import protocol
 

@@ -1,6 +1,8 @@
+# flake8: noqa
+
 import pytest
-import trio
 from pytest_trio.enable_trio_mode import *
+import trio
 
 
 async def fake_server(stream, *, task_status=trio.TASK_STATUS_IGNORED):
