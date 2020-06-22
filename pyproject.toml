@@ -17,6 +17,15 @@ pytest-trio = "^0.6.0"
 coverage = {extras = ["toml"], version = "^5.1"}
 pytest-cov = "^2.10.0"
 rope = "^0.17.0"
+sphinx = "^3.1.1"
+flake8 = "^3.8.3"
+flake8-bandit = "^2.1.2"
+flake8-black = "^0.2.0"
+flake8-bugbear = "^20.1.4"
+flake8-import-order = "^0.18.1"
+safety = "^1.9.0"
+flake8-docstrings = "^1.5.0"
+darglint = "^1.4.1"
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]

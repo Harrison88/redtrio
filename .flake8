@@ -1,0 +1,8 @@
+[flake8]
+select = B,B9,BLK,C,D,DAR,E,F,I,S,W
+ignore = E203,E501,W503
+per-file-ignores = tests/*:S101
+max-line-length = 80
+application-import-names = redtrio,tests
+import-order-style = google
+docstring-convention = google
