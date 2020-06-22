@@ -5,6 +5,9 @@ from . import protocol
 
 
 class RedisClient:
+    """Documentation for RedisClient is here
+    """
+
     def __init__(
         self,
         host: str = "127.0.0.1",
@@ -26,6 +29,8 @@ class RedisClient:
         self.write_command = write_command
 
     async def call(self, command: bytes, *args: bytes):
+        """Documentation for *call*
+        """
         buffer = self.write_command(command, *args)
         connection = await self.connection_pool.wait_for_connection()
         await connection.send_all(buffer)

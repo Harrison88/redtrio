@@ -13,7 +13,7 @@ def tests(session):
     session.run("pytest", *args)
 
 
-locations = "src", "tests", "noxfile.py"
+locations = "src", "tests", "noxfile.py", "docs/conf.py"
 
 
 @nox.session(python=["3.8"])
@@ -46,6 +46,13 @@ def safety(session):
         )
         install_with_constraints(session, "safety")
         session.run("safety", "check", f"--file={requirements.name}", "--full-report")
+
+
+@nox.session(python="3.8")
+def docs(session):
+    """Build the documentation."""
+    install_with_constraints(session, "sphinx", "sphinx-autoapi")
+    session.run("sphinx-build", "docs", "docs/_build")
 
 
 def install_with_constraints(session, *args, **kwargs):
