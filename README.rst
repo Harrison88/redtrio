@@ -1,0 +1,1 @@
+![Tests](https://github.com/Harrison88/redtrio/workflows/Tests/badge.svg)
