@@ -6,6 +6,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8']
+        redis-version: [6]
     name: Python ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@v2
@@ -13,6 +14,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
+    - uses: supercharge/redis-github-action@1.1.0
+      with:
+        redis-version: ${{ matrix.redis-version }}
     - run: pip install nox==2019.11.9
     - run: pip install poetry==1.0.5
     - run: nox
