@@ -1,5 +1,6 @@
 from redtrio import __version__
+from importlib import metadata
 
 
 def test_version():
-    assert __version__ == "0.1.0"
+    assert __version__ == metadata.version("redtrio")
