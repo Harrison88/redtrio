@@ -25,7 +25,7 @@ def test_command_responses_one_byte(reader, command_data):
         result = reader.get_object()
         print("Got result:", result)
         print(reader.state_stack)
-        assert result is False
+        assert result is reader.sentinel
         print("Feeding", b)
         reader.feed(b)
 
@@ -44,7 +44,7 @@ def test_command_responses_two_bytes(reader, command_data):
             second = True
         else:
             result = reader.get_object()
-            assert result is False
+            assert result is reader.sentinel
             second = False
             reader.feed(b)
 

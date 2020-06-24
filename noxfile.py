@@ -2,7 +2,7 @@ import tempfile
 
 import nox
 
-nox.options.sessions = "lint", "safety", "tests"
+nox.options.sessions = "safety", "tests"
 
 @nox.session(python=["3.8"])
 def tests(session):
@@ -48,6 +48,13 @@ def safety(session):
         install_with_constraints(session, "safety")
         session.run("safety", "check", f"--file={requirements.name}", "--full-report")
 
+
+@nox.session(python="3.8")
+def coverage(session):
+    """Upload coverage data."""
+    install_with_constraints(session, "coverage[toml]", "codecov")
+    session.run("coverage", "xml", "--fail-under=0")
+    session.run("codecov", *session.posargs)
 
 @nox.session(python="3.8")
 def docs(session):
