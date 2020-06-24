@@ -59,6 +59,7 @@ class RedisClient:
         await connection.send_all(buffer)
         async for data in connection:
             self.reader.feed(data)
-            if output := self.reader.get_object():
+            output = self.reader.get_object()
+            if output is not self.reader.sentinel:
                 self.connection_pool.put_connection(connection)
                 return output
