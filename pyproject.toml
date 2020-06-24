@@ -1,9 +1,24 @@
 [tool.poetry]
 name = "redtrio"
-version = "0.1.0"
+version = "0.2.0"
 description = "An async (Trio) client for Redis 6+"
 authors = ["Harrison Morgan <harrison.morgan@gmail.com>"]
 license = "bsd-3-clause"
+
+readme = "README.md"
+repository = "https://github.com/Harrison88/redtrio"
+documentation = "https://redtrio.readthedocs.io/en/latest/"
+
+keywords = ["async", "trio", "redis", "resp3"]
+
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Framework :: Trio",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3.8"
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.8"
