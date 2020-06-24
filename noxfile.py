@@ -2,6 +2,7 @@ import tempfile
 
 import nox
 
+nox.options.sessions = "lint", "safety", "tests"
 
 @nox.session(python=["3.8"])
 def tests(session):
