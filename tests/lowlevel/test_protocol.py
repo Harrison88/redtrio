@@ -80,7 +80,9 @@ def test_boolean(reader):
 
 def test_blob_error(reader):
     """It parses blob errors correctly."""
-    reader.feed(b"!21\r\nSYNTAX invalid syntax\r\n")
+    for byte in b"!21\r\nSYNTAX invalid syntax\r\n":
+        assert reader.get_object() is reader.sentinel
+        reader.feed(byte.to_bytes(1, "little"))
     assert reader.get_object() == protocol.RedisError(b"SYNTAX", b"invalid syntax")
 
 
