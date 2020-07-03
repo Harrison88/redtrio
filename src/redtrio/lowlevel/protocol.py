@@ -19,6 +19,7 @@ class RedisError(Exception):
     """Represents an error returned from the Redis server."""
 
     def __eq__(self, other):
+        """It is equal to another RedisError if it has the same arguments."""
         return self.args == other.args
 
 
