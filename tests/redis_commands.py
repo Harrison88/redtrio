@@ -52,4 +52,14 @@ redis_commands = {
         "response": b"_\r\n",
         "response_value": None,
     },
+    b"ZADD myset 1.2 foo": {
+        "encoded": b"*4\r\n$4\r\nZADD\r\n$5\r\nmyset\r\n$3\r\n1.2\r\n$3\r\nfoo\r\n",
+        "response": b":1\r\n",
+        "response_value": 1,
+    },
+    b"ZSCORE myset foo": {
+        "encoded": b"*3\r\n$6\r\nZSCORE\r\n$5\r\nmyset\r\n$3\r\nfoo\r\n",
+        "response": b",1.2\r\n",
+        "response_value": 1.2,
+    },
 }

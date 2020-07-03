@@ -48,6 +48,7 @@ class Resp3Reader:
             ord("*"): self.parse_array,
             ord("-"): self.parse_simple_error,
             ord("_"): self.parse_null,
+            ord(","): self.parse_double,
         }
 
     def feed(self, data: bytes):
@@ -299,6 +300,21 @@ class Resp3Reader:
         state = {"function": self.parse_null}
         self.eat_linebreak(state=state)
         return None
+
+    def parse_double(self, state: t.Optional[dict] = None) -> float:
+        """Parse a double (byte: ,) into a float.
+
+        Arguments:
+            state (dict): doubles don't require state, but this argument is still
+                present to keep the function signature the same as other object
+                parsers.
+
+        Returns:
+            The parsed float.
+        """
+        state = {"function": self.parse_double}
+        line = self.eat_linebreak(state=state)
+        return float(line)
 
 
 def write_command(command: bytes, *args: bytes) -> bytes:
