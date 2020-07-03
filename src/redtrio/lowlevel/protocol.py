@@ -22,6 +22,10 @@ class RedisError(Exception):
         return self.args == other.args
 
 
+class ProtocolError(Exception):
+    """An error occurred while parsing."""
+
+
 class Resp3Reader:
     """This class parses RESP3 responses from the Redis server.
 
@@ -49,6 +53,7 @@ class Resp3Reader:
             ord("-"): self.parse_simple_error,
             ord("_"): self.parse_null,
             ord(","): self.parse_double,
+            ord("#"): self.parse_boolean,
         }
 
     def feed(self, data: bytes):
@@ -315,6 +320,31 @@ class Resp3Reader:
         state = {"function": self.parse_double}
         line = self.eat_linebreak(state=state)
         return float(line)
+
+    def parse_boolean(self, state: t.Optional[dict] = None) -> bool:
+        """Parse a boolean (byte: #) into a bool.
+
+        Arguments:
+            state (dict): boolens don't require state, but this argument is still
+                present to keep the function signature the same as other object
+                parsers.
+
+        Returns:
+            The parsed bool.
+
+        Raises:
+            ProtocolError: an incorrect value was passed (not t or f).
+        """
+        state = {"function": self.parse_boolean}
+        line = self.eat_linebreak(state=state)
+        if line == b"t":
+            return True
+        if line == b"f":
+            return False
+
+        raise ProtocolError(
+            "A boolean was supposed to be parsed, but the value was neither t nor f"
+        )
 
 
 def write_command(command: bytes, *args: bytes) -> bytes:

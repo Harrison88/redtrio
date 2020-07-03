@@ -61,3 +61,18 @@ def test_command_responses_two_bytes(reader, command_data):
 
     result = reader.get_object()
     assert result == command_data["response_value"]
+
+
+def test_boolean(reader):
+    """It parses boolean responses correctly. # noqa
+
+    This is separate from the redis_commands tests because, as far as I could
+    find, there is currently no redis command that returns a boolean value.
+    """
+    reader.feed(b"#t\r\n")
+    assert reader.get_object() is True
+    reader.feed(b"#f\r\n")
+    assert reader.get_object() is False
+    reader.feed(b"#wrong\r\n")
+    with pytest.raises(protocol.ProtocolError):
+        reader.get_object()
