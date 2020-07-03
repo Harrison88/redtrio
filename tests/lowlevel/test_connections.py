@@ -1,3 +1,5 @@
+"""Tests for the connection pool."""
+
 import pytest
 import trio
 

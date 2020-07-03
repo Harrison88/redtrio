@@ -1,4 +1,6 @@
-"""Using the commands and responses defined in redis_commands.py,
+"""Test the RESP3 protocol reader and writer.
+
+Using the commands and responses defined in redis_commands.py,
 feed the responses through a Resp3Reader instance and make sure the correct
 object is returned.
 """
