@@ -47,6 +47,7 @@ class Resp3Reader:
             ord(":"): self.parse_number,
             ord("*"): self.parse_array,
             ord("-"): self.parse_simple_error,
+            ord("_"): self.parse_null,
         }
 
     def feed(self, data: bytes):
@@ -283,6 +284,21 @@ class Resp3Reader:
         line = self.eat_linebreak(state=state)
         error, _, message = line.partition(b" ")
         return RedisError(error, message)
+
+    def parse_null(self, state: t.Optional[dict] = None) -> None:
+        """Parse null (byte: _) into None.
+
+        Arguments:
+            state (dict): null doesn't require state, but this argument is still
+                present to keep the function signature the same as other object
+                parsers.
+
+        Returns:
+            None
+        """
+        state = {"function": self.parse_null}
+        self.eat_linebreak(state=state)
+        return None
 
 
 def write_command(command: bytes, *args: bytes) -> bytes:

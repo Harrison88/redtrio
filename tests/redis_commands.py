@@ -47,4 +47,9 @@ redis_commands = {
             b"ERR", b"unknown command `NOT`, with args beginning with: `A`, `COMMAND`, "
         ),
     },
+    b"GET nonexistent": {
+        "encoded": b"*2\r\n$3\r\nGET\r\n$11\r\nnonexistant\r\n",
+        "response": b"_\r\n",
+        "response_value": None,
+    },
 }
