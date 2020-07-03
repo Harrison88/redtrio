@@ -12,7 +12,7 @@ import typing as t
 
 
 class NotEnoughDataError(Exception):
-    """Raised (and caught) in Resp3Reader to indicate that not enough data has been fed to perform the next operation."""
+    """Raised to indicate that not enough data has been fed to parse the object."""
 
 
 class Resp3Reader:
@@ -20,11 +20,15 @@ class Resp3Reader:
 
     Attributes:
         _buffer (bytearray): Data gets fed into this buffer and removed by the parser.
-        sentinel (object): A sentinel object, returned by *get_object* when no object has been parsed yet.
-        state_stack (list): A stack that keeps track of the state, allowing restarting after more data has been fed.
+        sentinel (object): A sentinel object, returned by *get_object* when no object
+            has been parsed yet.
+        state_stack (list): A stack that keeps track of the state, allowing
+            restarting after more data has been fed.
         types (dict): A mapping of parser functions related to a particular byte.
     """
+
     def __init__(self):
+        """Initialize the Resp3Reader."""
         self._buffer = bytearray()
         self.sentinel = object()
         self.state_stack: t.List[dict] = []
@@ -53,10 +57,14 @@ class Resp3Reader:
 
         Arguments:
             num_bytes (int): The number of bytes to attempt to remove from the buffer.
-            state (dict): A dictionary containing the state, to be saved in the event there isn't enough data.
+            state (dict): A dictionary containing the state, to be saved in the
+                event there isn't enough data.
 
         Returns:
             A bytearray containing the requested number of bytes from _buffer.
+
+        Raises:
+            NotEnoughDataError: Not enough data is in the buffer.
         """
         if state:
             self.state_stack.append(state)
@@ -76,7 +84,14 @@ class Resp3Reader:
         The linebreak is discarded, while all the data up to the linebreak is returned.
 
         Arguments:
-            state (dict): A dictionary containing the state, to be saved in the event there isn't enough data.
+            state (dict): A dictionary containing the state, to be saved in the
+                event there isn't enough data.
+
+        Returns:
+            A bytearray containing the data up to, and excluding, the linebreak.
+
+        Raises:
+            NotEnoughDataError: Not enough data is in the buffer.
         """
         linebreak = b"\r\n"
 
@@ -108,11 +123,17 @@ class Resp3Reader:
 
         If check_state and the state stack is not empty,
         then run through the state stack to return to the previous state.
-        Otherwise, eat a byte and use it to determine which specific object parser to call.
+        Otherwise, eat a byte and use it to determine which specific object
+            parser to call.
 
         Arguments:
-            check_state (bool): Whether to check the state stack or not (default: True).
-            state (dict): State to be saved while checking the state stack (default: None).
+            check_state (bool): Whether to check the state stack or not
+                (default: True).
+            state (dict): State to be saved while checking the state stack
+                (default: None).
+
+        Returns:
+            The parsed object.
         """
         if check_state and self.state_stack:
             checked_state = self.state_stack.pop(0)
@@ -137,7 +158,8 @@ class Resp3Reader:
         """Parse a RESP3 map object (byte: %) into a Python dictionary.
 
         Arguments:
-            state (dict): If this is passed, parsing will resume from where it left off.
+            state (dict): If this is passed, parsing will resume from where it
+                left off.
 
         Returns:
             The parsed dictionary.
@@ -170,7 +192,8 @@ class Resp3Reader:
 
         Arguments:
             state (dict): Simple strings don't require state, but this argument
-            is still present to keep the signature the same as other object parsers.
+                is still present to keep the signature the same as other object
+                parsers.
 
         Returns:
             A bytes object representing the parsed simple string.
@@ -183,7 +206,8 @@ class Resp3Reader:
         """Parse a RESP3 blob (byte: $) into a bytes object.
 
         Arguments:
-            state (dict): If this is passed, parsing will resume from where it left off.
+            state (dict): If this is passed, parsing will resume from where it
+                left off.
 
         Returns:
             A bytes object representing the parsed blob string.
@@ -205,7 +229,8 @@ class Resp3Reader:
 
         Arguments:
             state (dict): Numbers don't require state, but this argument is still
-            present to keep the function signature the same as other object parsers.
+                present to keep the function signature the same as other object
+                parsers.
 
         Returns:
             An int representing the parsed number.
@@ -218,7 +243,8 @@ class Resp3Reader:
         """Parse a RESP3 array (byte: *) into a Python list.
 
         Arguments:
-            state (dict): If this is passed, parsing will resume from where it left off.
+            state (dict): If this is passed, parsing will resume from where it
+                left off.
 
         Returns:
             A list representing the parsed array.
@@ -236,7 +262,7 @@ class Resp3Reader:
 
 
 def write_command(command: bytes, *args: bytes) -> bytes:
-    """Encode the given command and args into a RESP3 array to be sent to the server.
+    r"""Encode the given command and args into a RESP3 array to be sent to the server.
 
     Note that no spaces are allowed in the command. Redis commands that contain a space
     (for example, "MODULE LOAD")

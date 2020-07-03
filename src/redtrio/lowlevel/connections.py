@@ -15,11 +15,12 @@ class ConnectionPool:
     Attributes:
         host (str): The address to connect to.
         port (int): The port to connect to.
-        max_connections (int): The maximum number of connections to keep (default: 50).
-        spawn_connection: The function used to spawn a new connection (default: trio.open_tcp_stream).
+        max_connections (int): The maximum number of connections to keep.
+        spawn_connection: The function used to spawn a new connection.
         used_connections (set): A set containing connections currently in use.
         pool: The pool of unused connections.
     """
+
     def __init__(
         self,
         host: str,
@@ -27,6 +28,14 @@ class ConnectionPool:
         max_connections: int = 50,
         spawn_connection: t.Callable = trio.open_tcp_stream,
     ):
+        """Initialize the ConnectionPool.
+
+        Arguments:
+            host (str): The address to connect to.
+            port (int): The port to connect to.
+            max_connections (int): The maximum number of connections (default: 50).
+            spawn_connection: Spawn a connection (default: trio.open_tcp_stream).
+        """
         self.host = host
         self.port = port
         self.max_connections = max_connections

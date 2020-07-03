@@ -1,11 +1,15 @@
+"""Automated testing, linting, docs, and other scripts."""
+
 import tempfile
 
 import nox
 
 nox.options.sessions = "safety", "tests"
 
+
 @nox.session(python=["3.8"])
 def tests(session):
+    """Run the tests."""
     args = session.posargs or ["--cov", "-m", "not e2e"]
     session.run("poetry", "install", "--no-dev", external=True)
     install_with_constraints(
@@ -19,6 +23,7 @@ locations = "src", "tests", "noxfile.py", "docs/conf.py"
 
 @nox.session(python=["3.8"])
 def lint(session):
+    """Run flake8 with various plugins."""
     args = session.posargs or locations
     install_with_constraints(
         session,
@@ -35,6 +40,7 @@ def lint(session):
 
 @nox.session(python="3.8")
 def safety(session):
+    """Check dependencies for security."""
     with tempfile.NamedTemporaryFile() as requirements:
         session.run(
             "poetry",
@@ -56,6 +62,7 @@ def coverage(session):
     session.run("coverage", "xml", "--fail-under=0")
     session.run("codecov", *session.posargs)
 
+
 @nox.session(python="3.8")
 def docs(session):
     """Build the documentation."""
@@ -64,6 +71,7 @@ def docs(session):
 
 
 def install_with_constraints(session, *args, **kwargs):
+    """Install packages into a session, using poetry to constrain the version."""
     with tempfile.NamedTemporaryFile() as requirements:
         session.run(
             "poetry",

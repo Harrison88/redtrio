@@ -6,6 +6,7 @@ import trio
 
 
 async def fake_server(stream, *, task_status=trio.TASK_STATUS_IGNORED):
+    """Monitor a stream and respond to redis PING commands with PONG."""
     task_status.started()
     while True:
         data = await stream.receive_some()
@@ -15,6 +16,7 @@ async def fake_server(stream, *, task_status=trio.TASK_STATUS_IGNORED):
 
 @pytest.fixture
 async def trickle_connection(nursery):
+    """Create in-memory stream to fake_server, trickle response 1 byte at a time."""
     server_socket, client_socket = trio.testing.memory_stream_pair()
     await nursery.start(fake_server, server_socket)
 

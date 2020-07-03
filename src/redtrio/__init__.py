@@ -1,3 +1,5 @@
+"""Redtrio is a modern async client for Redis, supporting the new RESP3 protocol."""
+
 from importlib import metadata
 
 try:
