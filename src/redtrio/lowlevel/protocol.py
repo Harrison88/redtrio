@@ -56,6 +56,7 @@ class Resp3Reader:
             ord("#"): self.parse_boolean,
             ord("!"): self.parse_blob_error,
             ord("="): self.parse_verbatim_string,
+            ord("("): self.parse_big_number,
         }
 
     def feed(self, data: bytes):
@@ -396,6 +397,21 @@ class Resp3Reader:
 
         self.eat(2, state=state)  # Discard the line break after the data
         return state["object"][4:]  # Return the string after the format marker.
+
+    def parse_big_number(self, state: t.Optional[dict] = None) -> int:
+        """Parse a big number (byte: () into an int.
+
+        Arguments:
+            state (dict): big numbers don't require state, but this argument is still
+                present to keep the function signature the same as other object
+                parsers.
+
+        Returns:
+            The parsed int.
+        """
+        state = {"function": self.parse_big_number}
+        line = self.eat_linebreak(state=state)
+        return int(line)
 
 
 def write_command(command: bytes, *args: bytes) -> bytes:

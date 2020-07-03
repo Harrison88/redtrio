@@ -82,3 +82,9 @@ def test_blob_error(reader):
     """It parses blob errors correctly."""
     reader.feed(b"!21\r\nSYNTAX invalid syntax\r\n")
     assert reader.get_object() == protocol.RedisError(b"SYNTAX", b"invalid syntax")
+
+
+def test_big_number(reader):
+    """It parses big numbers correctly."""
+    reader.feed(b"(3492890328409238509324850943850943825024385\r\n")
+    assert reader.get_object() == 3492890328409238509324850943850943825024385
