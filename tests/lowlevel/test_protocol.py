@@ -76,3 +76,9 @@ def test_boolean(reader):
     reader.feed(b"#wrong\r\n")
     with pytest.raises(protocol.ProtocolError):
         reader.get_object()
+
+
+def test_blob_error(reader):
+    """It parses blob errors correctly."""
+    reader.feed(b"!21\r\nSYNTAX invalid syntax\r\n")
+    assert reader.get_object() == protocol.RedisError(b"SYNTAX", b"invalid syntax")

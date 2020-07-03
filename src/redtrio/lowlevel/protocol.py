@@ -54,6 +54,7 @@ class Resp3Reader:
             ord("_"): self.parse_null,
             ord(","): self.parse_double,
             ord("#"): self.parse_boolean,
+            ord("!"): self.parse_blob_error,
         }
 
     def feed(self, data: bytes):
@@ -345,6 +346,31 @@ class Resp3Reader:
         raise ProtocolError(
             "A boolean was supposed to be parsed, but the value was neither t nor f"
         )
+
+    def parse_blob_error(self, state: t.Optional[dict] = None) -> RedisError:
+        """Parse a blob error (byte: !) into a RedisError.
+
+        Has the same basic implementation as a blob string.
+
+        Arguments:
+            state (dict): If this is passed, parsing will resume from where it
+                left off.
+
+        Returns:
+            The parsed RedisError.
+        """
+        if state is None:
+            state = {"function": self.parse_blob_error}
+
+        if "length" not in state:
+            state["length"] = int(self.eat_linebreak(state=state))
+
+        if "object" not in state:
+            state["object"] = self.eat(state["length"], state=state)
+
+        self.eat(2, state=state)  # Discard the line break after the data
+        error, _, message = state["object"].partition(b" ")
+        return RedisError(error, message)
 
 
 def write_command(command: bytes, *args: bytes) -> bytes:
