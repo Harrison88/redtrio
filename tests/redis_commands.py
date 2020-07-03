@@ -1,4 +1,6 @@
 # flake8: noqa
+from redtrio.lowlevel.protocol import RedisError
+
 redis_commands = {
     b"HELLO 3": {
         "encoded": b"*2\r\n$5\r\nHELLO\r\n$1\r\n3\r\n",
@@ -37,5 +39,12 @@ redis_commands = {
         "encoded": b"*3\r\n$4\r\nMGET\r\n$8\r\nlanguage\r\n$7\r\nversion\r\n",
         "response": b"*2\r\n$6\r\nPython\r\n$1\r\n3\r\n",
         "response_value": [b"Python", b"3"],
+    },
+    b"NOT A COMMAND": {
+        "encoded": b"*3\r\n$3\r\nNOT\r\n$1\r\nA\r\n$7\r\nCOMMAND\r\n",
+        "response": b"-ERR unknown command `NOT`, with args beginning with: `A`, `COMMAND`, \r\n",
+        "response_value": RedisError(
+            b"ERR", b"unknown command `NOT`, with args beginning with: `A`, `COMMAND`, "
+        ),
     },
 }

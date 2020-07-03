@@ -15,6 +15,13 @@ class NotEnoughDataError(Exception):
     """Raised to indicate that not enough data has been fed to parse the object."""
 
 
+class RedisError(Exception):
+    """Represents an error returned from the Redis server."""
+
+    def __eq__(self, other):
+        return self.args == other.args
+
+
 class Resp3Reader:
     """This class parses RESP3 responses from the Redis server.
 
@@ -39,6 +46,7 @@ class Resp3Reader:
             ord("$"): self.parse_blob,
             ord(":"): self.parse_number,
             ord("*"): self.parse_array,
+            ord("-"): self.parse_simple_error,
         }
 
     def feed(self, data: bytes):
@@ -49,7 +57,7 @@ class Resp3Reader:
         """
         self._buffer.extend(data)
 
-    def eat(self, num_bytes: int, state: t.Optional[dict] = None) -> bytearray:
+    def eat(self, num_bytes: int, state: t.Optional[dict] = None) -> bytes:
         """Remove the specified number of bytes from _buffer and return them.
 
         If there aren't enough bytes, raises NotEnoughDataError. If state was passed,
@@ -61,7 +69,7 @@ class Resp3Reader:
                 event there isn't enough data.
 
         Returns:
-            A bytearray containing the requested number of bytes from _buffer.
+            A bytes object containing the requested number of bytes from _buffer.
 
         Raises:
             NotEnoughDataError: Not enough data is in the buffer.
@@ -74,9 +82,9 @@ class Resp3Reader:
             self.state_stack.pop()
         data = self._buffer[:num_bytes]
         del self._buffer[:num_bytes]
-        return data
+        return bytes(data)
 
-    def eat_linebreak(self, state: dict) -> bytearray:
+    def eat_linebreak(self, state: dict) -> bytes:
         """A convenience function to call *eat* up to the next CRLF.
 
         If there isn't enough data in the buffer, the state is saved on the stack
@@ -102,7 +110,7 @@ class Resp3Reader:
 
         index = self._buffer.index(linebreak)
         data = self.eat(index + 2)
-        return data[:-2]
+        return bytes(data[:-2])
 
     def get_object(self) -> t.Any:
         """Get an object using the data from *feed*.
@@ -259,6 +267,22 @@ class Resp3Reader:
             state["object"].append(self.parse(state=state))
 
         return state["object"]
+
+    def parse_simple_error(self, state: t.Optional[dict] = None) -> RedisError:
+        """Parse a simple error (byte: -) into a RedisError.
+
+        Arguments:
+            state (dict): Simple errors don't require state, but this argument is still
+                present to keep the function signature the same as other object
+                parsers.
+
+        Returns:
+            A RedisError representing the parsed error.
+        """
+        state = {"function": self.parse_simple_error}
+        line = self.eat_linebreak(state=state)
+        error, _, message = line.partition(b" ")
+        return RedisError(error, message)
 
 
 def write_command(command: bytes, *args: bytes) -> bytes:
