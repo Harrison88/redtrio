@@ -15,6 +15,18 @@ class NotEnoughDataError(Exception):
     """Raised to indicate that not enough data has been fed to parse the object."""
 
 
+class RedisError(Exception):
+    """Represents an error returned from the Redis server."""
+
+    def __eq__(self, other):
+        """It is equal to another RedisError if it has the same arguments."""
+        return self.args == other.args
+
+
+class ProtocolError(Exception):
+    """An error occurred while parsing."""
+
+
 class Resp3Reader:
     """This class parses RESP3 responses from the Redis server.
 
@@ -39,6 +51,13 @@ class Resp3Reader:
             ord("$"): self.parse_blob,
             ord(":"): self.parse_number,
             ord("*"): self.parse_array,
+            ord("-"): self.parse_simple_error,
+            ord("_"): self.parse_null,
+            ord(","): self.parse_double,
+            ord("#"): self.parse_boolean,
+            ord("!"): self.parse_blob_error,
+            ord("="): self.parse_verbatim_string,
+            ord("("): self.parse_big_number,
         }
 
     def feed(self, data: bytes):
@@ -49,7 +68,7 @@ class Resp3Reader:
         """
         self._buffer.extend(data)
 
-    def eat(self, num_bytes: int, state: t.Optional[dict] = None) -> bytearray:
+    def eat(self, num_bytes: int, state: t.Optional[dict] = None) -> bytes:
         """Remove the specified number of bytes from _buffer and return them.
 
         If there aren't enough bytes, raises NotEnoughDataError. If state was passed,
@@ -61,7 +80,7 @@ class Resp3Reader:
                 event there isn't enough data.
 
         Returns:
-            A bytearray containing the requested number of bytes from _buffer.
+            A bytes object containing the requested number of bytes from _buffer.
 
         Raises:
             NotEnoughDataError: Not enough data is in the buffer.
@@ -74,9 +93,9 @@ class Resp3Reader:
             self.state_stack.pop()
         data = self._buffer[:num_bytes]
         del self._buffer[:num_bytes]
-        return data
+        return bytes(data)
 
-    def eat_linebreak(self, state: dict) -> bytearray:
+    def eat_linebreak(self, state: dict) -> bytes:
         """A convenience function to call *eat* up to the next CRLF.
 
         If there isn't enough data in the buffer, the state is saved on the stack
@@ -102,7 +121,7 @@ class Resp3Reader:
 
         index = self._buffer.index(linebreak)
         data = self.eat(index + 2)
-        return data[:-2]
+        return bytes(data[:-2])
 
     def get_object(self) -> t.Any:
         """Get an object using the data from *feed*.
@@ -259,6 +278,141 @@ class Resp3Reader:
             state["object"].append(self.parse(state=state))
 
         return state["object"]
+
+    def parse_simple_error(self, state: t.Optional[dict] = None) -> RedisError:
+        """Parse a simple error (byte: -) into a RedisError.
+
+        Arguments:
+            state (dict): Simple errors don't require state, but this argument is still
+                present to keep the function signature the same as other object
+                parsers.
+
+        Returns:
+            A RedisError representing the parsed error.
+        """
+        state = {"function": self.parse_simple_error}
+        line = self.eat_linebreak(state=state)
+        error, _, message = line.partition(b" ")
+        return RedisError(error, message)
+
+    def parse_null(self, state: t.Optional[dict] = None) -> None:
+        """Parse null (byte: _) into None.
+
+        Arguments:
+            state (dict): null doesn't require state, but this argument is still
+                present to keep the function signature the same as other object
+                parsers.
+
+        Returns:
+            None
+        """
+        state = {"function": self.parse_null}
+        self.eat_linebreak(state=state)
+        return None
+
+    def parse_double(self, state: t.Optional[dict] = None) -> float:
+        """Parse a double (byte: ,) into a float.
+
+        Arguments:
+            state (dict): doubles don't require state, but this argument is still
+                present to keep the function signature the same as other object
+                parsers.
+
+        Returns:
+            The parsed float.
+        """
+        state = {"function": self.parse_double}
+        line = self.eat_linebreak(state=state)
+        return float(line)
+
+    def parse_boolean(self, state: t.Optional[dict] = None) -> bool:
+        """Parse a boolean (byte: #) into a bool.
+
+        Arguments:
+            state (dict): boolens don't require state, but this argument is still
+                present to keep the function signature the same as other object
+                parsers.
+
+        Returns:
+            The parsed bool.
+
+        Raises:
+            ProtocolError: an incorrect value was passed (not t or f).
+        """
+        state = {"function": self.parse_boolean}
+        line = self.eat_linebreak(state=state)
+        if line == b"t":
+            return True
+        if line == b"f":
+            return False
+
+        raise ProtocolError(
+            "A boolean was supposed to be parsed, but the value was neither t nor f"
+        )
+
+    def parse_blob_error(self, state: t.Optional[dict] = None) -> RedisError:
+        """Parse a blob error (byte: !) into a RedisError.
+
+        Has the same basic implementation as a blob string.
+
+        Arguments:
+            state (dict): If this is passed, parsing will resume from where it
+                left off.
+
+        Returns:
+            The parsed RedisError.
+        """
+        if state is None:
+            state = {"function": self.parse_blob_error}
+
+        if "length" not in state:
+            state["length"] = int(self.eat_linebreak(state=state))
+
+        if "object" not in state:
+            state["object"] = self.eat(state["length"], state=state)
+
+        self.eat(2, state=state)  # Discard the line break after the data
+        error, _, message = state["object"].partition(b" ")
+        return RedisError(error, message)
+
+    def parse_verbatim_string(self, state: t.Optional[dict] = None) -> bytes:
+        """Parse a verbatim string (byte: =) into bytes.
+
+        Has the same basic implementation as a blob string.
+
+        Arguments:
+            state (dict): If this is passed, parsing will resume from where it
+                left off.
+
+        Returns:
+            The parsed bytes.
+        """
+        if state is None:
+            state = {"function": self.parse_verbatim_string}
+
+        if "length" not in state:
+            state["length"] = int(self.eat_linebreak(state=state))
+
+        if "object" not in state:
+            state["object"] = self.eat(state["length"], state=state)
+
+        self.eat(2, state=state)  # Discard the line break after the data
+        return state["object"][4:]  # Return the string after the format marker.
+
+    def parse_big_number(self, state: t.Optional[dict] = None) -> int:
+        """Parse a big number (byte: () into an int.
+
+        Arguments:
+            state (dict): big numbers don't require state, but this argument is still
+                present to keep the function signature the same as other object
+                parsers.
+
+        Returns:
+            The parsed int.
+        """
+        state = {"function": self.parse_big_number}
+        line = self.eat_linebreak(state=state)
+        return int(line)
 
 
 def write_command(command: bytes, *args: bytes) -> bytes:
