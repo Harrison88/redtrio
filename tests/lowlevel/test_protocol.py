@@ -1,3 +1,8 @@
+"""Using the commands and responses defined in redis_commands.py,
+feed the responses through a Resp3Reader instance and make sure the correct
+object is returned.
+"""
+
 import pytest
 
 from redtrio.lowlevel import protocol
@@ -6,11 +11,13 @@ from ..redis_commands import redis_commands
 
 @pytest.fixture
 def reader():
+    """A fresh instance of protocol.Resp3Reader for every test."""
     return protocol.Resp3Reader()
 
 
 @pytest.mark.parametrize("command_data", redis_commands.values())
 def test_command_responses(reader, command_data):
+    """It parses responses correctly for each command."""
     print("About to test", command_data["response_value"])
     reader.feed(command_data["response"])
     result = reader.get_object()
@@ -19,6 +26,7 @@ def test_command_responses(reader, command_data):
 
 @pytest.mark.parametrize("command_data", redis_commands.values())
 def test_command_responses_one_byte(reader, command_data):
+    """It parses responses correctly, when data is fed one byte at a time."""
     print("About to test", command_data["response_value"], "one byte at a time")
     for b in (i.to_bytes(1, "little") for i in command_data["response"]):
         print("Getting object")
@@ -37,6 +45,7 @@ def test_command_responses_one_byte(reader, command_data):
 
 @pytest.mark.parametrize("command_data", redis_commands.values())
 def test_command_responses_two_bytes(reader, command_data):
+    """It parses responses correctly, when data is fed two bytes at a time."""
     second = False
     for b in (i.to_bytes(1, "little") for i in command_data["response"]):
         if not second:
