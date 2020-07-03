@@ -18,7 +18,8 @@ class RedisClient:
         connection_pool (instance of a connection pool): The pool to use for
             connections. Leave as None to use the default ConnectionPool.
         Reader (protocol class): The class to use for interpreting responses from Redis.
-        write_command (function): The function to use to format commands to send to Redis.
+        write_command (function): The function to use to format commands to send
+            to Redis.
     """
 
     def __init__(
@@ -30,6 +31,16 @@ class RedisClient:
         Reader: type = protocol.Resp3Reader,
         write_command: t.Callable = protocol.write_command,
     ):
+        """Initialize the RedisClient.
+
+        Arguments:
+            host (str): The address to connect to (default: "127.0.0.1").
+            port (int): The port to connect to (default: 6379).
+            connection_pool: A connection pool to use. Overrides host and port.
+                Leave as None to use the default ConnectionPool.
+            Reader: the class to use for parsing replies from the server.
+            write_command: the function used to prepare commands sent to the server.
+        """
         self.host = host
         self.port = port
 
