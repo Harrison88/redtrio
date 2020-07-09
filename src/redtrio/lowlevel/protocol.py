@@ -58,6 +58,7 @@ class Resp3Reader:
             ord("!"): self.parse_blob_error,
             ord("="): self.parse_verbatim_string,
             ord("("): self.parse_big_number,
+            ord("~"): self.parse_set,
         }
 
     def feed(self, data: bytes):
@@ -413,6 +414,29 @@ class Resp3Reader:
         state = {"function": self.parse_big_number}
         line = self.eat_linebreak(state=state)
         return int(line)
+
+    def parse_set(self, state: t.Optional[dict] = None) -> set:
+        """Parse a RESP3 set (byte: ~) into a Python set.
+
+        Has the same basic implementation as an array.
+
+        Arguments:
+            state (dict): If this is passed, parsing will resume from where it
+                left off.
+
+        Returns:
+            A set representing the parsed set.
+        """
+        if state is None:
+            state = {"function": self.parse_set, "object": set()}
+
+        if "length" not in state:
+            state["length"] = int(self.eat_linebreak(state=state))
+
+        while len(state["object"]) < state["length"]:
+            state["object"].add(self.parse(state=state))
+
+        return state["object"]
 
 
 def write_command(command: bytes, *args: bytes) -> bytes:
