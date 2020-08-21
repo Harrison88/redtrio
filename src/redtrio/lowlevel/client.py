@@ -5,8 +5,9 @@ Classes:
 """
 import typing as t
 
+from respy3 import protocol
+
 from . import connections
-from . import protocol
 
 
 class RedisClient:

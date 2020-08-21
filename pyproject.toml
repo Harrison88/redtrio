@@ -23,6 +23,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 trio = "~=0.16"
+respy3 = "^0.3.2"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
