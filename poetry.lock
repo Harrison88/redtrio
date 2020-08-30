@@ -614,7 +614,7 @@ description = "A RESP3 protocol parser for Python"
 name = "respy3"
 optional = false
 python-versions = ">=3.7,<4.0"
-version = "0.3.2"
+version = "0.4.0"
 
 [[package]]
 category = "dev"
@@ -913,7 +913,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "850e801b314ea17ce9953b5edbfcf946adf9d75158d1503f1dd89d06b9eb64ba"
+content-hash = "90dee185a354680bbc6731784b36dd811985d29ca4f83d71015ff1458713aa3f"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -1287,8 +1287,8 @@ requests = [
     {file = "requests-2.24.0.tar.gz", hash = "sha256:b3559a131db72c33ee969480840fff4bb6dd111de7dd27c8ee1f820f4f00231b"},
 ]
 respy3 = [
-    {file = "respy3-0.3.2-py3-none-any.whl", hash = "sha256:68ba44789ac21b8efdbeda8550d0131d6c36a9176c308ca70dd3395d88d9e4a2"},
-    {file = "respy3-0.3.2.tar.gz", hash = "sha256:7338f6f6d43b9213759f89dd54c6791539f9acee7ddff2d3bfa4d19f2cac12ed"},
+    {file = "respy3-0.4.0-py3-none-any.whl", hash = "sha256:3fcb4cb427d276a0b2b194e953155573b0873d24137461027825c163e1839a21"},
+    {file = "respy3-0.4.0.tar.gz", hash = "sha256:d1b8fd9839702e050982fef233e66ca4ed53d16df0889981b312bcbad20805b5"},
 ]
 rope = [
     {file = "rope-0.17.0.tar.gz", hash = "sha256:658ad6705f43dcf3d6df379da9486529cf30e02d9ea14c5682aa80eb33b649e1"},
