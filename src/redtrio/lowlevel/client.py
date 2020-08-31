@@ -3,11 +3,15 @@
 Classes:
     RedisClient
 """
+from collections import defaultdict
 import typing as t
 
 from respy3 import protocol
 
 from . import connections
+
+
+PUSH_COMMANDS = {b"SUBSCRIBE", b"PSUBSCRIBE", b"UNSUBSCRIBE", b"PUNSUBSCRIBE"}
 
 
 class RedisClient:
@@ -52,6 +56,32 @@ class RedisClient:
 
         self.reader = Reader()
         self.write_command = write_command
+        self.push_callbacks: defaultdict = defaultdict(list)
+
+    async def receive(self, connection, push_only: bool = False):
+        while True:
+            output = self.reader.get_object()
+            if output is self.reader.sentinel:
+                pass
+            elif isinstance(output, protocol.RespPush):
+                callbacks = self.push_callbacks[output.push_type]
+                for callback in callbacks:
+                    callback(output)
+                if push_only:
+                    return None
+                continue
+            else:
+                return output
+
+            data = await connection.receive_some()
+            self.reader.feed(data)
+
+    async def send_command(self, command: bytes, *args: bytes, connection=None):
+        buffer = self.write_command(command, *args)
+        if connection is None:
+            connection = await self.connection_pool.wait_for_connection()
+        await connection.send_all(buffer)
+        return connection
 
     async def call(self, command: bytes, *args: bytes):
         """Send the given command to Redis and return the response.
@@ -66,12 +96,13 @@ class RedisClient:
         Example:
             call(b"SET", b"key_name", b"value") -> b"OK"
         """
-        buffer = self.write_command(command, *args)
-        connection = await self.connection_pool.wait_for_connection()
-        await connection.send_all(buffer)
-        async for data in connection:
-            self.reader.feed(data)
-            output = self.reader.get_object()
-            if output is not self.reader.sentinel:
-                self.connection_pool.put_connection(connection)
-                return output
+        connection = await self.send_command(command, *args)
+        response = await self.receive(
+            connection, push_only=command.upper() in PUSH_COMMANDS
+        )
+        self.connection_pool.put_connection(connection)
+        return response
+
+    def register_push_callback(self, push_type: bytes, callback: t.Callable) -> None:
+        """Register a function to be called when a push is received."""
+        self.push_callbacks[push_type].append(callback)
