@@ -42,6 +42,7 @@ async def test_parse_streamed_data(autojump_clock, nursery, client, trickle_conn
 
 
 async def test_push_callback(autojump_clock, client, client2):
+    """It calls the correct callback when a push is received."""
     channel = b"test_channel"
     message = b"Hello, world!"
     subscribe_called = False
@@ -87,6 +88,7 @@ async def test_push_callback(autojump_clock, client, client2):
 
 
 async def test_push_received_with_command(autojump_clock, client, client2):
+    """It calls the push callback even when it is received inbetween commands."""
     channel = b"test_channel2"
     message = b"42 is the answer"
     message_called = False
