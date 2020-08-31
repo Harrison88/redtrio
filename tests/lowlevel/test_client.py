@@ -118,4 +118,3 @@ async def test_push_received_with_command(autojump_clock, client, client2):
         assert result == b"PONG" or isinstance(result, dict)
 
     assert message_called
-
