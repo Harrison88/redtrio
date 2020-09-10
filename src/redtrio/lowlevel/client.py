@@ -83,7 +83,7 @@ class RedisClient:
                     callback(output)
                 if push_only:
                     return None
-                continue
+                continue  # pragma: nocover
             else:
                 return output
 
