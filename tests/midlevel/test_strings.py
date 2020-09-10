@@ -122,3 +122,24 @@ async def test_append(client):
     expected = value.encode() * 2
     actual = await client.get(key)
     assert actual == expected
+
+
+async def test_bitcount(client):
+    """It returns the proper responses for BITCOUNT."""
+    key = "midlevel_bitcount_test"
+    value = "value"
+
+    # When the key does not exist, 0 is returned.
+    expected = 0
+    actual = await client.bitcount(key)
+    assert actual == expected
+
+    # When the key does exist, an int is returned.
+    await client.set(key, value)
+    expected = 21
+    actual = await client.bitcount(key)
+    assert actual == expected
+
+    expected = 8
+    actual = await client.bitcount(key, 0, 1)
+    assert actual == expected
