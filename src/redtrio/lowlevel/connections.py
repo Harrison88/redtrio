@@ -54,14 +54,15 @@ class ConnectionPool:
             A connection to the Redis server.
         """
         connection = None
-        while not connection:
+        while not connection:  # pragma: nobranch
             if self.pool:
                 connection = self.pool.pop()
+                break
             elif len(self.used_connections) + len(self.pool) < self.max_connections:
                 connection = await self.spawn_connection(self.host, self.port)
                 break
 
-            await trio.sleep(1)
+            await trio.sleep(5)
 
         self.used_connections.add(connection)
         return connection
