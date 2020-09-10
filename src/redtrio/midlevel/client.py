@@ -114,9 +114,11 @@ class MidlevelClient:
 
     ### String commands: https://redis.io/commands/#string ###
     async def append(self, key: str, value: str) -> bytes:
+        """Implement the APPEND command (https://redis.io/commands/append)."""
         return await self.call("APPEND", key, value)
 
     async def get(self, key: str) -> bytes:
+        """Implement the GET command (https://redis.io/commands/get)."""
         return await self.call("GET", key)
 
     async def set(
@@ -130,6 +132,7 @@ class MidlevelClient:
         nx: bool = False,
         xx: bool = False,
     ):
+        """Implement the SET command (https://redis.io/commands/set)."""
         command = ["SET", key, value]
         if bool(ex) + bool(px) + keepttl > 1:
             raise ValueError(
