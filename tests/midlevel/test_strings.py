@@ -76,3 +76,29 @@ async def test_set(client):
     expected = None
     actual = await client.get(key)
     assert actual == expected
+
+
+async def test_set_bad_arguments(client):
+    """It raises an error when bad combinations of arguments are passed."""
+    with pytest.raises(ValueError):
+        await client.set("random key", "random value", ex=3, keepttl=True)
+
+    with pytest.raises(ValueError):
+        await client.set("random key", "random value", ex=3, px=1000)
+
+    with pytest.raises(ValueError):
+        await client.set("random key", "random value", nx=True, xx=True)
+
+
+async def test_set_keepttl(client):
+    """It properly passes the keepttl argument to Redis."""
+    key = "midlevel_set_keepttl_test"
+
+    # When keepttl is set, changing the value won't reset the ttl.
+    # We can check this by setting a value with a ttl, then changing the value
+    # with keepttl=True, then checking to make sure the ttl is still the same.
+
+    await client.set(key, "something random", ex=100)
+    await client.set(key, "something else", keepttl=True)
+    result = await client.call("TTL", key)
+    assert result > 1
