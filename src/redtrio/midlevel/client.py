@@ -113,6 +113,9 @@ class MidlevelClient:
         return await self.call("HVALS", key)
 
     ### String commands: https://redis.io/commands/#string ###
+    async def append(self, key: str, value: str) -> bytes:
+        return await self.call("APPEND", key, value)
+
     async def get(self, key: str) -> bytes:
         return await self.call("GET", key)
 
