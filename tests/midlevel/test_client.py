@@ -1,4 +1,6 @@
-import pytest
+"""This module contains test related to the midlevel client itself."""
+
+import pytest  # noqa
 
 from redtrio.midlevel import MidlevelClient
 
@@ -12,7 +14,7 @@ def test_arguments_passed_through():
     host = "Nothing"
     port = -1
     connection_pool = True
-    write_command = lambda x: x
+    write_command = lambda x: x  # noqa
 
     client = MidlevelClient(
         host=host,

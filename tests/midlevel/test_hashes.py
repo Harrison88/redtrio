@@ -1,3 +1,5 @@
+"""This module contains the tests for Redis' hash commands."""
+
 import pytest
 
 from redtrio.midlevel import MidlevelClient
@@ -5,12 +7,20 @@ from redtrio.midlevel import MidlevelClient
 
 @pytest.fixture
 async def client():
+    """A fresh client for every test.
+
+    Also flushes the database to prevent conflicts.
+
+    Returns:
+        An instance of :class:`midlevel.MidlevelClient`.
+    """
     client = MidlevelClient()
     await client.call("FLUSHALL")
     return client
 
 
 async def test_hdel(client):
+    """It returns the proper responses for HDEL."""
     key = "midlevel_hdel_test"
 
     # When the field doesn't exist, HDEL returns 0.
@@ -32,6 +42,7 @@ async def test_hdel(client):
 
 
 async def test_hexists(client):
+    """It returns the proper responses for HEXISTS."""
     key = "midlevel_hexists_test"
 
     # When the key doesn't exist, 0 is returned.
@@ -47,6 +58,7 @@ async def test_hexists(client):
 
 
 async def test_hget(client):
+    """It returns the proper responses for HGET."""
     key = "midlevel_hget_test"
     field = "test"
 
@@ -65,6 +77,7 @@ async def test_hget(client):
 
 
 async def test_hgetall(client):
+    """It returns the proper responses for HGETALL."""
     key = "midlevel_hgetall_test"
     field = "hello, world!"
     value = "Yes, it is I."
@@ -83,6 +96,7 @@ async def test_hgetall(client):
 
 
 async def test_hincrby(client):
+    """It returns the proper responses for HINCRBY."""
     key = "midlevel_hincrby_test"
     field = "test_increment"
     increment = 42
@@ -100,6 +114,7 @@ async def test_hincrby(client):
 
 
 async def test_hincrbyfloat(client):
+    """It returns the proper responses for HINCRBYFLOAT."""
     key = "midlevel_hincrbyfloat_test"
     field = "test_increment"
     increment = 3.14
@@ -114,6 +129,7 @@ async def test_hincrbyfloat(client):
 
 
 async def test_hkeys(client):
+    """It returns the proper responses for HKEYS."""
     key = "midlevel_hkeys_test"
     field = "test_hkeys"
 
@@ -130,6 +146,7 @@ async def test_hkeys(client):
 
 
 async def test_hlen(client):
+    """It returns the proper responses for HLEN."""
     key = "midlevel_hlen_test"
 
     # When the key does not exist, 0 is returned.
@@ -145,6 +162,7 @@ async def test_hlen(client):
 
 
 async def test_hmget(client):
+    """It returns the proper responses for HMGET."""
     key = "midlevel_hmget_test"
     field = "hello"
     value = "yes"
@@ -168,6 +186,7 @@ async def test_hmget(client):
 
 
 async def test_hset(client):
+    """It returns the proper responses for HSET."""
     key = "midlevel_hset_test"
     field = "something"
     value = "valuable"
@@ -192,6 +211,7 @@ async def test_hset(client):
 
 
 async def test_hsetnx(client):
+    """It returns the proper responses for HSETNX."""
     key = "midlevel_hsetnx_test"
     field = "something"
 
@@ -207,6 +227,7 @@ async def test_hsetnx(client):
 
 
 async def test_hstrlen(client):
+    """It returns the proper responses for HSTRLEN."""
     key = "midlevel_hstrlen_test"
     field = "field"
     value = "This is 22 chars long."
@@ -224,6 +245,7 @@ async def test_hstrlen(client):
 
 
 async def test_hvals(client):
+    """It returns the proper responses for HVALS."""
     key = "midlevel_hvals_test"
     field = "field"
     value = "value"
