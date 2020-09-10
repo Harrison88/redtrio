@@ -111,3 +111,39 @@ class MidlevelClient:
     async def hvals(self, key: str) -> list:
         """Implement the HVALS command (https://redis.io/commands/hvals)."""
         return await self.call("HVALS", key)
+
+    ### String commands: https://redis.io/commands/#string ###
+    async def get(self, key: str) -> bytes:
+        return await self.call("GET", key)
+
+    async def set(
+        self,
+        key: str,
+        value: str,
+        *,
+        ex: int = 0,
+        px: int = 0,
+        keepttl: bool = False,
+        nx: bool = False,
+        xx: bool = False,
+    ):
+        command = ["SET", key, value]
+        if bool(ex) + bool(px) + keepttl > 1:
+            raise ValueError(
+                f"More than one of {ex=}, {px=}, and {keepttl=} were specified"
+            )
+        if ex:
+            command.extend(["EX", str(ex)])
+        elif px:
+            command.extend(["PX", str(px)])
+        elif keepttl:
+            command.append("KEEPTTL")
+
+        if nx and xx:
+            raise ValueError("Both nx and xx were specified")
+        if nx:
+            command.append("NX")
+        elif xx:
+            command.append("XX")
+
+        return await self.call(*command)
