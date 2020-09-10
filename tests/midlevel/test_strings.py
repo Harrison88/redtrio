@@ -102,3 +102,23 @@ async def test_set_keepttl(client):
     await client.set(key, "something else", keepttl=True)
     result = await client.call("TTL", key)
     assert result > 1
+
+
+async def test_append(client):
+    """It returns the proper responses for APPEND."""
+    key = "midlevel_append_test"
+    value = "something random"
+
+    # When the key doesn't exist, it creates the key and returns the length.
+    expected = len(value)
+    actual = await client.append(key, value)
+    assert actual == expected
+
+    # When the key does exist, it appends the value and returns the new length.
+    expected = len(value) * 2
+    actual = await client.append(key, value)
+    assert actual == expected
+
+    expected = value.encode() * 2
+    actual = await client.get(key)
+    assert actual == expected
