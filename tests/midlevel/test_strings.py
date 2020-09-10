@@ -70,7 +70,7 @@ async def test_set(client):
 
     # When PX is specified, the key should expire.
     expected = b"OK"
-    actual = await client.set(key, value, px=100)
+    actual = await client.set(key, value, px=50)
     assert actual == expected
     time.sleep(0.1)
     expected = None
