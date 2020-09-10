@@ -6,14 +6,14 @@ from redtrio.lowlevel import RedisClient
 
 
 class MidlevelClient:
-    """MidlevelClient is an abstraction on top of the lowlevel client."""
+    """MidlevelClient is an abstraction on top of the lowlevel client.
+
+    Args:
+        **client_args: any arg accepted by :class:`lowlevel.RedisClient`.
+    """
 
     def __init__(self, **client_args):
-        """Initialize MidlevelClient.
-
-        Args:
-            **client_args: any arg accepted by :class:`lowlevel.RedisClient`.
-        """
+        """Initialize MidlevelClient."""
         self.client = RedisClient(**client_args)
         self.said_hello = False
 
