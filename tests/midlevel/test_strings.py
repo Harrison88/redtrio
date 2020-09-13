@@ -143,3 +143,53 @@ async def test_bitcount(client):
     expected = 8
     actual = await client.bitcount(key, 0, 1)
     assert actual == expected
+
+
+async def test_bitop(client):
+    """It returns the proper responses for BITOP."""
+    destination_key = "midlevel_bitop_test"
+    source_key = "midlevel_bitop_source"
+    source_key2 = "midlevel_bitop_source2"
+    value = "foobar"
+    value2 = "abcdef"
+
+    await client.set(source_key, value)
+    await client.set(source_key2, value2)
+
+    # BITOP AND performs the AND operation between the source keys, stores the
+    # result in the destination_key, and returns the integer length of the result.
+    expected = 6
+    actual = await client.bitop("AND", destination_key, source_key, source_key2)
+    assert actual == expected
+    expected = b"`bc`ab"
+    actual = await client.get(destination_key)
+    assert actual == expected
+
+    # BITOP OR performs the OR operation between the source keys, stores the
+    # result in the destination_key, and returns the integer length of the result.
+    expected = 6
+    actual = await client.bitop("OR", destination_key, source_key, source_key2)
+    assert actual == expected
+    expected = b"goofev"
+    actual = await client.get(destination_key)
+    assert actual == expected
+
+    # BITOP XOR performs the XOR operation between the source keys, stores the
+    # result in the destination_key, and returns the integer length of the result.
+    expected = 6
+    actual = await client.bitop("XOR", destination_key, source_key, source_key2)
+    assert actual == expected
+    expected = b"\a\r\x0c\x06\x04\x14"
+    actual = await client.get(destination_key)
+    assert actual == expected
+
+    # BITOP NOT performs the NOT operation on the source key, stores the result
+    # in the destination_key, and returns the integer length of the result.
+    # Note that BITOP NOT is an unary operation, accepting only one source key,
+    # as opposed to the other operations which can take any number of source keys.
+    expected = 6
+    actual = await client.bitop("NOT", destination_key, source_key)
+    assert actual == expected
+    expected = b"\x99\x90\x90\x9d\x9e\x8d"
+    actual = await client.get(destination_key)
+    assert actual == expected
