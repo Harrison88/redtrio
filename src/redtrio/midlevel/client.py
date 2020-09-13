@@ -2,6 +2,8 @@
 
 All commands are divided by comments into sections based on https://redis.io/commands
 """
+import typing as t
+
 from redtrio.lowlevel import RedisClient
 
 
@@ -116,6 +118,16 @@ class MidlevelClient:
     async def append(self, key: str, value: str) -> bytes:
         """Implement the APPEND command (https://redis.io/commands/append)."""
         return await self.call("APPEND", key, value)
+
+    async def bitcount(
+        self, key: str, start: t.Optional[int] = None, end: t.Optional[int] = None
+    ):
+        """Implement the BITCOUNT command (https://redis.io/commands/bitcount)."""
+        command = ["BITCOUNT", key]
+        if start is not None and end is not None:
+            command.extend([str(start), str(end)])
+
+        return await self.call(*command)
 
     async def get(self, key: str) -> bytes:
         """Implement the GET command (https://redis.io/commands/get)."""
