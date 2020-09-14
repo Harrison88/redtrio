@@ -129,6 +129,14 @@ class MidlevelClient:
 
         return await self.call(*command)
 
+    async def bitop(
+        self,
+        command: t.Literal["AND", "OR", "XOR", "NOT"],
+        destination_key: str,
+        *source_keys: str,
+    ) -> int:
+        return await self.call("BITOP", command, destination_key, *source_keys)
+
     async def get(self, key: str) -> bytes:
         """Implement the GET command (https://redis.io/commands/get)."""
         return await self.call("GET", key)
