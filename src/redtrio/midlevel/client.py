@@ -135,7 +135,24 @@ class MidlevelClient:
         destination_key: str,
         *source_keys: str,
     ) -> int:
+        """Implement the BITOP command (https://redis.io/commands/bitop)."""
         return await self.call("BITOP", command, destination_key, *source_keys)
+
+    async def bitpos(
+        self,
+        key: str,
+        bit: t.Literal[0, 1],
+        start: t.Optional[int] = None,
+        end: t.Optional[int] = None,
+    ):
+        """Implement the BITPOS command (https://redis.io/commands/bitpos)."""
+        command = ["BITPOS", key, str(bit)]
+        if start:
+            command.append(str(start))
+        if end:
+            command.append(str(end))
+
+        return await self.call(*command)
 
     async def get(self, key: str) -> bytes:
         """Implement the GET command (https://redis.io/commands/get)."""
