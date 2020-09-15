@@ -227,3 +227,18 @@ async def test_bitpos(client):
     expected = -1
     actual = await client.bitpos(key, 0, start=3, end=4)
     assert actual == expected
+
+
+async def test_decr(client):
+    """It returns the proper responses for DECR."""
+    key = "midlevel_decr_test"
+
+    # When the key doesn't exist, it is initialized to 0, then decremented.
+    expected = -1
+    actual = await client.decr(key)
+    assert actual == expected
+
+    # When the key does exist, the value is decremented and returned as an int.
+    expected = -2
+    actual = await client.decr(key)
+    assert actual == expected
