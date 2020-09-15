@@ -193,3 +193,37 @@ async def test_bitop(client):
     expected = b"\x99\x90\x90\x9d\x9e\x8d"
     actual = await client.get(destination_key)
     assert actual == expected
+
+
+async def test_bitpos(client):
+    """It returns the proper responses for BITPOS."""
+    key = "midlevel_bitpos_test"
+
+    # Note that "\x00\xff", when encoded to UTF-8, becomes b"\x00\xc3\xbf".
+    await client.set(key, "\x00\xff")
+
+    # The first bit is 0, so BITPOS returns 0 in this case.
+    expected = 0
+    actual = await client.bitpos(key, 0)
+    assert actual == expected
+
+    # The first set bit is the first bit of the second bytes, so BITPOS returns
+    # 8 in this case.
+    expected = 8
+    actual = await client.bitpos(key, 1)
+    assert actual == expected
+
+    # Start is specified
+    expected = 17
+    actual = await client.bitpos(key, 0, start=2)
+    assert actual == expected
+
+    # Start is specified after the last 1, so BITPOS returns -1.
+    expected = -1
+    actual = await client.bitpos(key, 1, start=3)
+    assert actual == expected
+
+    # Start and end are specified, containing no 0's, so BITPOS returns -1.
+    expected = -1
+    actual = await client.bitpos(key, 0, start=3, end=4)
+    assert actual == expected
