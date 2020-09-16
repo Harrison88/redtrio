@@ -242,3 +242,18 @@ async def test_decr(client):
     expected = -2
     actual = await client.decr(key)
     assert actual == expected
+
+
+async def test_decrby(client):
+    """It returns the proper responses for DECRBY."""
+    key = "midlevel_decrby_test"
+
+    # When the key doesn't exist, it is initialized to 0, then decremented.
+    expected = -7
+    actual = await client.decrby(key, 7)
+    assert actual == expected
+
+    # When the key does exist, the value is decremented and returned as an int.
+    expected = -12
+    actual = await client.decrby(key, 5)
+    assert actual == expected
