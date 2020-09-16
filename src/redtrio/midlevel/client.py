@@ -2,6 +2,8 @@
 
 All commands are divided by comments into sections based on https://redis.io/commands
 """
+import typing as t
+
 from redtrio.lowlevel import RedisClient
 
 
@@ -116,6 +118,44 @@ class MidlevelClient:
     async def append(self, key: str, value: str) -> bytes:
         """Implement the APPEND command (https://redis.io/commands/append)."""
         return await self.call("APPEND", key, value)
+
+    async def bitcount(
+        self, key: str, start: t.Optional[int] = None, end: t.Optional[int] = None
+    ):
+        """Implement the BITCOUNT command (https://redis.io/commands/bitcount)."""
+        command = ["BITCOUNT", key]
+        if start is not None and end is not None:
+            command.extend([str(start), str(end)])
+
+        return await self.call(*command)
+
+    async def bitop(
+        self,
+        command: t.Literal["AND", "OR", "XOR", "NOT"],
+        destination_key: str,
+        *source_keys: str,
+    ) -> int:
+        """Implement the BITOP command (https://redis.io/commands/bitop)."""
+        return await self.call("BITOP", command, destination_key, *source_keys)
+
+    async def bitpos(
+        self,
+        key: str,
+        bit: t.Literal[0, 1],
+        start: t.Optional[int] = None,
+        end: t.Optional[int] = None,
+    ):
+        """Implement the BITPOS command (https://redis.io/commands/bitpos)."""
+        command = ["BITPOS", key, str(bit)]
+        if start:
+            command.append(str(start))
+        if end:
+            command.append(str(end))
+
+        return await self.call(*command)
+
+    async def decr(self, key: str) -> int:
+        return await self.call("DECR", key)
 
     async def get(self, key: str) -> bytes:
         """Implement the GET command (https://redis.io/commands/get)."""

@@ -122,3 +122,123 @@ async def test_append(client):
     expected = value.encode() * 2
     actual = await client.get(key)
     assert actual == expected
+
+
+async def test_bitcount(client):
+    """It returns the proper responses for BITCOUNT."""
+    key = "midlevel_bitcount_test"
+    value = "value"
+
+    # When the key does not exist, 0 is returned.
+    expected = 0
+    actual = await client.bitcount(key)
+    assert actual == expected
+
+    # When the key does exist, an int is returned.
+    await client.set(key, value)
+    expected = 21
+    actual = await client.bitcount(key)
+    assert actual == expected
+
+    expected = 8
+    actual = await client.bitcount(key, 0, 1)
+    assert actual == expected
+
+
+async def test_bitop(client):
+    """It returns the proper responses for BITOP."""
+    destination_key = "midlevel_bitop_test"
+    source_key = "midlevel_bitop_source"
+    source_key2 = "midlevel_bitop_source2"
+    value = "foobar"
+    value2 = "abcdef"
+
+    await client.set(source_key, value)
+    await client.set(source_key2, value2)
+
+    # BITOP AND performs the AND operation between the source keys, stores the
+    # result in the destination_key, and returns the integer length of the result.
+    expected = 6
+    actual = await client.bitop("AND", destination_key, source_key, source_key2)
+    assert actual == expected
+    expected = b"`bc`ab"
+    actual = await client.get(destination_key)
+    assert actual == expected
+
+    # BITOP OR performs the OR operation between the source keys, stores the
+    # result in the destination_key, and returns the integer length of the result.
+    expected = 6
+    actual = await client.bitop("OR", destination_key, source_key, source_key2)
+    assert actual == expected
+    expected = b"goofev"
+    actual = await client.get(destination_key)
+    assert actual == expected
+
+    # BITOP XOR performs the XOR operation between the source keys, stores the
+    # result in the destination_key, and returns the integer length of the result.
+    expected = 6
+    actual = await client.bitop("XOR", destination_key, source_key, source_key2)
+    assert actual == expected
+    expected = b"\a\r\x0c\x06\x04\x14"
+    actual = await client.get(destination_key)
+    assert actual == expected
+
+    # BITOP NOT performs the NOT operation on the source key, stores the result
+    # in the destination_key, and returns the integer length of the result.
+    # Note that BITOP NOT is an unary operation, accepting only one source key,
+    # as opposed to the other operations which can take any number of source keys.
+    expected = 6
+    actual = await client.bitop("NOT", destination_key, source_key)
+    assert actual == expected
+    expected = b"\x99\x90\x90\x9d\x9e\x8d"
+    actual = await client.get(destination_key)
+    assert actual == expected
+
+
+async def test_bitpos(client):
+    """It returns the proper responses for BITPOS."""
+    key = "midlevel_bitpos_test"
+
+    # Note that "\x00\xff", when encoded to UTF-8, becomes b"\x00\xc3\xbf".
+    await client.set(key, "\x00\xff")
+
+    # The first bit is 0, so BITPOS returns 0 in this case.
+    expected = 0
+    actual = await client.bitpos(key, 0)
+    assert actual == expected
+
+    # The first set bit is the first bit of the second bytes, so BITPOS returns
+    # 8 in this case.
+    expected = 8
+    actual = await client.bitpos(key, 1)
+    assert actual == expected
+
+    # Start is specified
+    expected = 17
+    actual = await client.bitpos(key, 0, start=2)
+    assert actual == expected
+
+    # Start is specified after the last 1, so BITPOS returns -1.
+    expected = -1
+    actual = await client.bitpos(key, 1, start=3)
+    assert actual == expected
+
+    # Start and end are specified, containing no 0's, so BITPOS returns -1.
+    expected = -1
+    actual = await client.bitpos(key, 0, start=3, end=4)
+    assert actual == expected
+
+
+async def test_decr(client):
+    """It returns the proper responses for DECR."""
+    key = "midlevel_decr_test"
+
+    # When the key doesn't exist, it is initialized to 0, then decremented.
+    expected = -1
+    actual = await client.decr(key)
+    assert actual == expected
+
+    # When the key does exist, the value is decremented and returned as an int.
+    expected = -2
+    actual = await client.decr(key)
+    assert actual == expected
