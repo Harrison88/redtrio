@@ -155,6 +155,7 @@ class MidlevelClient:
         return await self.call(*command)
 
     async def decr(self, key: str) -> int:
+        """Implement the DECR command (https://redis.io/commands/decr)."""
         return await self.call("DECR", key)
 
     async def get(self, key: str) -> bytes:
