@@ -257,3 +257,19 @@ async def test_decrby(client):
     expected = -12
     actual = await client.decrby(key, 5)
     assert actual == expected
+
+
+async def test_getbit(client):
+    """It returns the proper responses for GETBIT."""
+    key = "midlevel_getbit_test"
+
+    # When the key doesn't exist, all zeroes are assumed.
+    expected = 0
+    actual = await client.getbit(key, 5)
+    assert actual == expected
+
+    # When the key does exist, the requested bit is returned.
+    await client.set(key, "v")
+    expected = 1
+    actual = await client.getbit(key, 1)
+    assert actual == expected
