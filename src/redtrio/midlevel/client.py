@@ -166,6 +166,10 @@ class MidlevelClient:
         """Implement the GET command (https://redis.io/commands/get)."""
         return await self.call("GET", key)
 
+    async def getbit(self, key: str, index: int) -> int:
+        """Implement the GETBIT command (https://redis.io/commands/getbit)."""
+        return await self.call("GETBIT", key, str(index))
+
     async def set(
         self,
         key: str,
