@@ -273,3 +273,20 @@ async def test_getbit(client):
     expected = 1
     actual = await client.getbit(key, 1)
     assert actual == expected
+
+
+async def test_getrange(client):
+    """It returns the proper responses for GETRANGE."""
+    key = "midlevel_getrange_test"
+    value = "Hello!"
+
+    # When the key doesn't exist, empty bytes are returned.
+    expected = b""
+    actual = await client.getrange(key, 0, 5)
+    assert actual == expected
+
+    # When the key does exist, the range (inclusive) is returned.
+    await client.set(key, value)
+    expected = value.encode()
+    actual = await client.getrange(key, 0, -1)
+    assert actual == expected
