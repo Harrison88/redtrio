@@ -170,6 +170,10 @@ class MidlevelClient:
         """Implement the GETBIT command (https://redis.io/commands/getbit)."""
         return await self.call("GETBIT", key, str(index))
 
+    async def getrange(self, key: str, start: int, end: int) -> bytes:
+        """Implement the GETRANGE command (https://redis.io/commands/getrange)."""
+        return await self.call("GETRANGE", key, str(start), str(end))
+
     async def set(
         self,
         key: str,
