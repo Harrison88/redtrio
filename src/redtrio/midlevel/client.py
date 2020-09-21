@@ -155,11 +155,28 @@ class MidlevelClient:
         return await self.call(*command)
 
     async def decr(self, key: str) -> int:
+        """Implement the DECR command (https://redis.io/commands/decr)."""
         return await self.call("DECR", key)
+
+    async def decrby(self, key: str, decrement: int) -> int:
+        """Implement the DECRBY command (https://redis.io/commands/decrby)."""
+        return await self.call("DECRBY", key, str(decrement))
 
     async def get(self, key: str) -> bytes:
         """Implement the GET command (https://redis.io/commands/get)."""
         return await self.call("GET", key)
+
+    async def getbit(self, key: str, index: int) -> int:
+        """Implement the GETBIT command (https://redis.io/commands/getbit)."""
+        return await self.call("GETBIT", key, str(index))
+
+    async def getrange(self, key: str, start: int, end: int) -> bytes:
+        """Implement the GETRANGE command (https://redis.io/commands/getrange)."""
+        return await self.call("GETRANGE", key, str(start), str(end))
+
+    async def getset(self, key: str, value: str) -> t.Optional[bytes]:
+        """Implement the GETSET command (https://redis.io/commands/getset)."""
+        return await self.call("GETSET", key, value)
 
     async def set(
         self,

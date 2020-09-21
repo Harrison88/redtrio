@@ -242,3 +242,68 @@ async def test_decr(client):
     expected = -2
     actual = await client.decr(key)
     assert actual == expected
+
+
+async def test_decrby(client):
+    """It returns the proper responses for DECRBY."""
+    key = "midlevel_decrby_test"
+
+    # When the key doesn't exist, it is initialized to 0, then decremented.
+    expected = -7
+    actual = await client.decrby(key, 7)
+    assert actual == expected
+
+    # When the key does exist, the value is decremented and returned as an int.
+    expected = -12
+    actual = await client.decrby(key, 5)
+    assert actual == expected
+
+
+async def test_getbit(client):
+    """It returns the proper responses for GETBIT."""
+    key = "midlevel_getbit_test"
+
+    # When the key doesn't exist, all zeroes are assumed.
+    expected = 0
+    actual = await client.getbit(key, 5)
+    assert actual == expected
+
+    # When the key does exist, the requested bit is returned.
+    await client.set(key, "v")
+    expected = 1
+    actual = await client.getbit(key, 1)
+    assert actual == expected
+
+
+async def test_getrange(client):
+    """It returns the proper responses for GETRANGE."""
+    key = "midlevel_getrange_test"
+    value = "Hello!"
+
+    # When the key doesn't exist, empty bytes are returned.
+    expected = b""
+    actual = await client.getrange(key, 0, 5)
+    assert actual == expected
+
+    # When the key does exist, the range (inclusive) is returned.
+    await client.set(key, value)
+    expected = value.encode()
+    actual = await client.getrange(key, 0, -1)
+    assert actual == expected
+
+
+async def test_getset(client):
+    """It returns the proper responses for GETSET."""
+    key = "midlevel_getset_test"
+    value = "Hello"
+    value2 = "World!"
+
+    # When the key does not exist, None is returned.
+    expected = None
+    actual = await client.getset(key, value)
+    assert actual == expected
+
+    # When the key does exist, bytes are returned.
+    expected = value.encode()
+    actual = await client.getset(key, value2)
+    assert actual == expected
