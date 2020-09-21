@@ -290,3 +290,20 @@ async def test_getrange(client):
     expected = value.encode()
     actual = await client.getrange(key, 0, -1)
     assert actual == expected
+
+
+async def test_getset(client):
+    """It returns the proper responses for GETSET."""
+    key = "midlevel_getset_test"
+    value = "Hello"
+    value2 = "World!"
+
+    # When the key does not exist, None is returned.
+    expected = None
+    actual = await client.getset(key, value)
+    assert actual == expected
+
+    # When the key does exist, bytes are returned.
+    expected = value.encode()
+    actual = await client.getset(key, value2)
+    assert actual == expected
