@@ -182,6 +182,10 @@ class MidlevelClient:
         """Implement the INCR command (https://redis.io/commands/incr)."""
         return await self.call("INCR", key)
 
+    async def incrby(self, key: str, increment: int) -> int:
+        """Implement the INCRBY command (https://redis.io/commands/incrby)."""
+        return await self.call("INCRBY", key, str(increment))
+
     async def set(
         self,
         key: str,
