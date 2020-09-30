@@ -178,6 +178,10 @@ class MidlevelClient:
         """Implement the GETSET command (https://redis.io/commands/getset)."""
         return await self.call("GETSET", key, value)
 
+    async def incr(self, key: str) -> int:
+        """Implement the INCR command (https://redis.io/commands/incr)."""
+        return await self.call("INCR", key)
+
     async def set(
         self,
         key: str,
