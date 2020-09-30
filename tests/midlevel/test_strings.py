@@ -322,3 +322,19 @@ async def test_incr(client):
     expected = 2
     actual = await client.incr(key)
     assert actual == expected
+
+
+async def test_incrby(client):
+    """It returns the proper responses for INCRBY."""
+    key = "midlevel_incrby_test"
+    value = 42
+
+    # When the key does not exist, it is initialized to zero then incremented.
+    expected = value
+    actual = await client.incrby(key, value)
+    assert actual == expected
+
+    # When the key does exist, it is incremented and the new value is returned.
+    expected = value * 2
+    actual = await client.incrby(key, value)
+    assert actual == expected
