@@ -338,3 +338,19 @@ async def test_incrby(client):
     expected = value * 2
     actual = await client.incrby(key, value)
     assert actual == expected
+
+
+async def test_incrbyfloat(client):
+    """It returns the proper responses for INCRBYFLOAT."""
+    key = "midlevel_incrbyfloat_test"
+    value = 1.2
+
+    # When the key does not exist, it is initialized to zero then incremented.
+    expected = value
+    actual = await client.incrbyfloat(key, value)
+    assert actual == expected
+
+    # When the key does exist, it is incremented and the new value is returned.
+    expected = value * 2
+    actual = await client.incrbyfloat(key, value)
+    assert actual == expected
