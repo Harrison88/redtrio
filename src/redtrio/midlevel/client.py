@@ -186,6 +186,10 @@ class MidlevelClient:
         """Implement the INCRBY command (https://redis.io/commands/incrby)."""
         return await self.call("INCRBY", key, str(increment))
 
+    async def incrbyfloat(self, key: str, increment: float) -> float:
+        """Implement the INCRBYFLOAT command (https://redis.io/commands/incrbyfloat)."""
+        return float(await self.call("INCRBYFLOAT", key, str(increment)))
+
     async def set(
         self,
         key: str,
