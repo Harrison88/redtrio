@@ -307,3 +307,50 @@ async def test_getset(client):
     expected = value.encode()
     actual = await client.getset(key, value2)
     assert actual == expected
+
+
+async def test_incr(client):
+    """It returns the proper responses for INCR."""
+    key = "midlevel_incr_test"
+
+    # When the key does not exist, it is initialized to zero then incremented.
+    expected = 1
+    actual = await client.incr(key)
+    assert actual == expected
+
+    # When the key does exist, it is incremented and the new value is returned.
+    expected = 2
+    actual = await client.incr(key)
+    assert actual == expected
+
+
+async def test_incrby(client):
+    """It returns the proper responses for INCRBY."""
+    key = "midlevel_incrby_test"
+    value = 42
+
+    # When the key does not exist, it is initialized to zero then incremented.
+    expected = value
+    actual = await client.incrby(key, value)
+    assert actual == expected
+
+    # When the key does exist, it is incremented and the new value is returned.
+    expected = value * 2
+    actual = await client.incrby(key, value)
+    assert actual == expected
+
+
+async def test_incrbyfloat(client):
+    """It returns the proper responses for INCRBYFLOAT."""
+    key = "midlevel_incrbyfloat_test"
+    value = 1.2
+
+    # When the key does not exist, it is initialized to zero then incremented.
+    expected = value
+    actual = await client.incrbyfloat(key, value)
+    assert actual == expected
+
+    # When the key does exist, it is incremented and the new value is returned.
+    expected = value * 2
+    actual = await client.incrbyfloat(key, value)
+    assert actual == expected
