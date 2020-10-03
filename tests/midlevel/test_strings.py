@@ -356,6 +356,24 @@ async def test_incrbyfloat(client):
     assert actual == expected
 
 
+async def test_mget(client):
+    """It returns the proper responses for MGET."""
+    key = "midlevel_mget_test"
+    key2 = "midlevel_mget_test2"
+    value = "something original"
+
+    # When a key doesn't exist, None is returned.
+    expected = [None, None]
+    actual = await client.mget(key, key2)
+    assert actual == expected
+
+    # When a key does exist, its value is returned.
+    await client.mset(key, value, key2, value)
+    expected = [value.encode(), value.encode()]
+    actual = await client.mget(key, key2)
+    assert actual == expected
+
+
 async def test_mset(client):
     """It returns the proper responses for MSET."""
     key = "midlevel_mset_test"
