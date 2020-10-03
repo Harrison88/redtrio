@@ -190,6 +190,10 @@ class MidlevelClient:
         """Implement the INCRBYFLOAT command (https://redis.io/commands/incrbyfloat)."""
         return float(await self.call("INCRBYFLOAT", key, str(increment)))
 
+    async def mget(self, key: str, *keys: str) -> list:
+        """Implement the MGET command (https://redis.io/commands/mget)."""
+        return await self.call("MGET", key, *keys)
+
     async def mset(self, key: str, value: str, *more: str) -> bytes:
         """Implement the MSET command (https://redis.io/commands/mset)."""
         return await self.call("MSET", key, value, *more)
