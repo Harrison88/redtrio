@@ -354,3 +354,21 @@ async def test_incrbyfloat(client):
     expected = value * 2
     actual = await client.incrbyfloat(key, value)
     assert actual == expected
+
+
+async def test_mset(client):
+    """It returns the proper responses for MSET."""
+    key = "midlevel_mset_test"
+    key2 = "midlevel_mset_test2"
+    value = "a value"
+
+    # MSET never fails, and always returns b"OK".
+    expected = b"OK"
+    actual = await client.mset(key, value, key2, value)
+    assert actual == expected
+
+    # The keys both should have been set to the value.
+    expected = value.encode()
+    actual = await client.get(key)
+    actual2 = await client.get(key2)
+    assert actual == expected and actual2 == expected
