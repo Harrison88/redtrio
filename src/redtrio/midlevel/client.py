@@ -234,3 +234,7 @@ class MidlevelClient:
             command.append("XX")
 
         return await self.call(*command)
+
+    async def setbit(self, key: str, offset: int, value: t.Literal[0, 1]) -> int:
+        """Implement the SETBIT command (https://redis.io/commands/setbit)."""
+        return await self.call("SETBIT", key, str(offset), str(value))
