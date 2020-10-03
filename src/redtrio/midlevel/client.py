@@ -198,6 +198,10 @@ class MidlevelClient:
         """Implement the MSET command (https://redis.io/commands/mset)."""
         return await self.call("MSET", key, value, *more)
 
+    async def msetnx(self, key: str, value: str, *more: str) -> int:
+        """Implement the MSETNX command (https://redis.io/commands/msetnx)."""
+        return await self.call("MSETNX", key, value, *more)
+
     async def set(
         self,
         key: str,
