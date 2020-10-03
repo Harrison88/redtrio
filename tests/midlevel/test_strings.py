@@ -390,3 +390,20 @@ async def test_mset(client):
     actual = await client.get(key)
     actual2 = await client.get(key2)
     assert actual == expected and actual2 == expected
+
+
+async def test_msetnx(client):
+    """It returns the proper responses for MSETNX."""
+    key = "midlevel_msetnx_test"
+    key2 = "midlevel_msetnx_test2"
+    value = "something else"
+
+    # When none of the keys already exist, the int one is returned.
+    expected = 1
+    actual = await client.msetnx(key, value, key2, value)
+    assert actual == expected
+
+    # When any of the keys already exist, the int zero is returned.
+    expected = 0
+    actual = await client.msetnx(key, value, key2, value)
+    assert actual == expected
