@@ -407,3 +407,20 @@ async def test_msetnx(client):
     expected = 0
     actual = await client.msetnx(key, value, key2, value)
     assert actual == expected
+
+
+async def test_setbit(client):
+    """It returns the proper responses for SETBIT."""
+    key = "midlevel_setbit_test"
+    offset = 2
+
+    # When the key does not exist, all bits up to offset are initialized to 0.
+    # The bit is then set, and its previous value (0) is returned.
+    expected = 0
+    actual = await client.setbit(key, offset, 1)
+    assert actual == expected
+
+    # Set the bit to 0 now, and its previous value of 1 is returned.
+    expected = 1
+    actual = await client.setbit(key, offset, 0)
+    assert actual == expected
