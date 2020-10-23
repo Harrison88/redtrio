@@ -424,3 +424,22 @@ async def test_setbit(client):
     expected = 1
     actual = await client.setbit(key, offset, 0)
     assert actual == expected
+
+
+async def test_setrange(client):
+    """It returns the proper responses for SETRANGE."""
+    key = "midlevel_setrange_test"
+    offset = 2
+    value = "Hello"
+
+    # When the key doesn't exist, it is initialized to zero-bytes up to offset.
+    expected = 7
+    actual = await client.setrange(key, offset, value)
+    assert actual == expected
+
+    # When the key does exist, the value is written to it, starting at offset.
+    offset = 7
+    value = ", world!"
+    expected = 15
+    actual = await client.setrange(key, offset, value)
+    assert actual == expected
