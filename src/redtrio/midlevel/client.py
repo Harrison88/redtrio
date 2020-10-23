@@ -238,3 +238,7 @@ class MidlevelClient:
     async def setbit(self, key: str, offset: int, value: t.Literal[0, 1]) -> int:
         """Implement the SETBIT command (https://redis.io/commands/setbit)."""
         return await self.call("SETBIT", key, str(offset), str(value))
+
+    async def setrange(self, key: str, offset: int, value: str) -> int:
+        """Implement the SETRANGE command (https://redis.io/commands/setrange)."""
+        return await self.call("SETRANGE", key, str(offset), value)
