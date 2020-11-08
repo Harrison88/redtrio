@@ -443,3 +443,24 @@ async def test_setrange(client):
     expected = 15
     actual = await client.setrange(key, offset, value)
     assert actual == expected
+
+
+async def test_stralgo(client):
+    """It returns the proper respones for STRALGO."""
+    value = "Hello, world!"
+    value2 = "Hello, Redis!"
+
+    # When comparing two strings using the LCS algorithm, bytes are returned.
+    expected = b"Hello, d!"
+    actual = await client.stralgo("LCS", "STRINGS", value, value2)
+    assert actual == expected
+
+    # When LEN is specified, an int is returned instead.
+    expected = 9
+    actual = await client.stralgo("LCS", "STRINGS", value, value2, "LEN")
+    assert actual == expected
+
+    # When IDX is specified, a dict is returned.
+    expected = dict
+    actual = await client.stralgo("LCS", "STRINGS", value, value2, "IDX")
+    assert isinstance(actual, expected)
