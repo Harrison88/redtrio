@@ -39,3 +39,18 @@ async def test_sadd(client):
     expected = 2
     actual = await client.sadd(key, "new", "also new")
     assert actual == expected
+
+
+async def test_scard(client):
+    """It returns the proper responses for SCARD."""
+    key = "midlevel_scard_test"
+
+    # SCARD returns the number of elements in a set, or 0 if it doesn't exist.
+    expected = 0
+    actual = await client.scard(key)
+    assert actual == expected
+
+    await client.sadd(key, "value")
+    expected = 1
+    actual = await client.scard(key)
+    assert actual == expected
