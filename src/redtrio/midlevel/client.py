@@ -118,6 +118,10 @@ class MidlevelClient:
     async def sadd(self, key: str, *values: str) -> int:
         return await self.call("SADD", key, *values)
 
+    async def scard(self, key: str) -> int:
+        """Implement the SCARD command (https://redis.io/commands/scard)."""
+        return await self.call("SCARD", key)
+
     ### String commands: https://redis.io/commands/#string ###
     async def append(self, key: str, value: str) -> bytes:
         """Implement the APPEND command (https://redis.io/commands/append)."""
