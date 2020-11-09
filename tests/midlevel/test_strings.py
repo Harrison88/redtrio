@@ -464,3 +464,21 @@ async def test_stralgo(client):
     expected = dict
     actual = await client.stralgo("LCS", "STRINGS", value, value2, "IDX")
     assert isinstance(actual, expected)
+
+
+async def test_strlen(client):
+    """It returns the proper responses for STRLEN."""
+    key = "midlevel_strlen_test"
+
+    # When the key does not exist, 0 is returned.
+    expected = 0
+    actual = await client.strlen(key)
+    assert actual == expected
+
+    # When the key does exist, the length of the string is returned.
+    value = "hello"
+    await client.set(key, value)
+    expected = len(value)
+    actual = await client.strlen(key)
+    assert actual == expected
+
