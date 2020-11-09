@@ -248,3 +248,7 @@ class MidlevelClient:
     ) -> t.Union[str, int, dict]:
         """Implement the STRALGO command (https://redis.io/commands/stralgo)."""
         return await self.call("STRALGO", algo, *algo_args)
+
+    async def strlen(self, key: str) -> int:
+        """Implement the STRLEN command (https://redis.io/commands/strlen)."""
+        return await self.call("STRLEN", key)
