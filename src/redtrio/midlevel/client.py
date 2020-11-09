@@ -114,6 +114,10 @@ class MidlevelClient:
         """Implement the HVALS command (https://redis.io/commands/hvals)."""
         return await self.call("HVALS", key)
 
+    ### Sets commands: https://redis.io/commands#set ###
+    async def sadd(self, key: str, *values: str) -> int:
+        return await self.call("SADD", key, *values)
+
     ### String commands: https://redis.io/commands/#string ###
     async def append(self, key: str, value: str) -> bytes:
         """Implement the APPEND command (https://redis.io/commands/append)."""
