@@ -116,6 +116,7 @@ class MidlevelClient:
 
     ### Sets commands: https://redis.io/commands#set ###
     async def sadd(self, key: str, *values: str) -> int:
+        """Implement the SADD command (https://redis.io/commands/sadd)."""
         return await self.call("SADD", key, *values)
 
     async def scard(self, key: str) -> int:
