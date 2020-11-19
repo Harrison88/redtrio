@@ -54,3 +54,18 @@ async def test_scard(client):
     expected = 1
     actual = await client.scard(key)
     assert actual == expected
+
+
+async def test_smembers(client):
+    """It returns the proper responses for SMEMBERS."""
+    key = "midlevel_smembers_test"
+
+    # SMEMBERS returns the members of the set.
+    expected = set()
+    actual = await client.smembers(key)
+    assert actual == expected
+
+    await client.sadd(key, "a", "b")
+    expected = set(["a".encode(), "b".encode()])
+    actual = await client.smembers(key)
+    assert actual == expected
