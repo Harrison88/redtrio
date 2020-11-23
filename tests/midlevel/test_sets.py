@@ -69,3 +69,29 @@ async def test_smembers(client):
     expected = set(["a".encode(), "b".encode()])
     actual = await client.smembers(key)
     assert actual == expected
+
+
+async def test_sdiff(client):
+    """It returns the proper responses for SDIFF."""
+    key = "midlevel_sdiff_test"
+    key2 = key + "2"
+    key3 = key + "3"
+
+    a, b, c = "a", "b", "c"
+    await client.sadd(key, a, b, c)
+
+    # SDIFF returns the result of subtracting the second and subsequent sets from
+    # the first set.
+    expected = set([a.encode(), b.encode(), c.encode()])
+    actual = await client.sdiff(key, key2)
+    assert actual == expected
+
+    await client.sadd(key2, a, c)
+    expected = set([b.encode()])
+    actual = await client.sdiff(key, key2)
+    assert actual == expected
+
+    await client.sadd(key3, b)
+    expected = set()
+    actual = await client.sdiff(key, key2, key3)
+    assert actual == expected
