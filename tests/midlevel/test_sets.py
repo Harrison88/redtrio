@@ -95,3 +95,33 @@ async def test_sdiff(client):
     expected = set()
     actual = await client.sdiff(key, key2, key3)
     assert actual == expected
+
+
+async def test_sdiffstore(client):
+    """It returns the proper responses for SDIFFSTORE."""
+    destination = "midlevel_sdiffstore_destination"
+    key = "midlevel_sdiffstore_test"
+    key2 = key + "2"
+    key3 = key + "3"
+
+    a, b, c = "a", "b", "c"
+    await client.sadd(key, a, b, c)
+
+    # SDIFFSTORE performs SDIFF, then stores the result in the destination key
+    # and returns the number of elements in the result.
+    expected = 3
+    actual = await client.sdiffstore(destination, key, key2)
+    assert actual == expected
+
+    await client.sadd(key2, a, c)
+    expected = 1
+    actual = await client.sdiffstore(destination, key, key2)
+    assert actual == expected
+    expected = set([b.encode()])
+    actual = await client.smembers(destination)
+    assert actual == expected
+
+    await client.sadd(key3, b)
+    expected = 0
+    actual = await client.sdiffstore(destination, key, key2, key3)
+    assert actual == expected
