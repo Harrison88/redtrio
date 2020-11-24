@@ -125,3 +125,28 @@ async def test_sdiffstore(client):
     expected = 0
     actual = await client.sdiffstore(destination, key, key2, key3)
     assert actual == expected
+
+
+async def test_sinter(client):
+    """It returns the proper responses for SINTER."""
+    key = "midlevel_sinter_test"
+    key2 = key + "2"
+    key3 = key + "3"
+
+    a, b, c = "a", "b", "c"
+    await client.sadd(key, a, b, c)
+
+    # SINTER returns the intersection of all sets.
+    expected = set()
+    actual = await client.sinter(key, key2)
+    assert actual == expected
+
+    await client.sadd(key2, b, c)
+    expected = set([b.encode(), c.encode()])
+    actual = await client.sinter(key, key2)
+    assert actual == expected
+
+    await client.sadd(key3, a, b)
+    expected = set([b.encode()])
+    actual = await client.sinter(key, key2, key3)
+    assert actual == expected
