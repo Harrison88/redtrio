@@ -127,6 +127,10 @@ class MidlevelClient:
         """Implement the SDIFF command (https://redis.io/commands/sdiff)."""
         return await self.call("SDIFF", key, *keys)
 
+    async def sdiffstore(self, destination: str, key: str, *keys: str) -> int:
+        """Implement the SDIFFSTORE command (https://redis.io/commands/sdiffstore)."""
+        return await self.call("SDIFFSTORE", destination, key, *keys)
+
     async def smembers(self, key: str) -> set:
         """Implement the SMEMBERS command (https://redis.io/commands/smember)."""
         return await self.call("SMEMBERS", key)
