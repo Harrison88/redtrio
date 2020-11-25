@@ -135,6 +135,10 @@ class MidlevelClient:
         """Implement the SINTER command (https://redis.io/commands/sinter)."""
         return await self.call("SINTER", key, *keys)
 
+    async def sinterstore(self, destination: str, key: str, *keys: str):
+        """Implement the SINTERSTORE command (https://redis.io/commands/sinterstore)."""
+        return await self.call("SINTERSTORE", destination, key, *keys)
+
     async def smembers(self, key: str) -> set:
         """Implement the SMEMBERS command (https://redis.io/commands/smember)."""
         return await self.call("SMEMBERS", key)
