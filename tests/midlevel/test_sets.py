@@ -150,3 +150,34 @@ async def test_sinter(client):
     expected = set([b.encode()])
     actual = await client.sinter(key, key2, key3)
     assert actual == expected
+
+
+async def test_sinterstore(client):
+    """It returns the proper responses for SINTERSTORE."""
+    destination = "midlevel_sinterstore_destination"
+    key = "midlevel_sinterstore_test"
+    key2 = key + "2"
+    key3 = key + "3"
+
+    a, b, c = "a", "b", "c"
+    await client.sadd(key, a, b, c)
+
+    # SINTERSTORE takes the intersection of all given sets and stores the result
+    # in the destination key, then returns the number of members in the result.
+
+    expected = 0
+    actual = await client.sinterstore(destination, key, key2)
+    assert actual == expected
+
+    await client.sadd(key2, b, c)
+    expected = 2
+    actual = await client.sinterstore(destination, key, key2)
+    assert actual == expected
+    expected = set([b.encode(), c.encode()])
+    actual = await client.smembers(destination)
+    assert actual == expected
+
+    await client.sadd(key3, a, b)
+    expected = 1
+    actual = await client.sinterstore(destination, key, key2, key3)
+    assert actual == expected
