@@ -201,3 +201,32 @@ async def test_sismember(client):
     expected = False
     actual = await client.sismember(key, b)
     assert actual == expected
+
+
+async def test_smismember(client):
+    """It returns the proper responses for SMISMEMBER."""
+    key = "midlevel_smismember_test"
+    a, b = "a", "b"
+
+    # SMISMEMBER returns a list indicating which of the provided members is part
+    # of the set or not.
+    expected = [False, False]
+    actual = await client.smismember(key, a, b)
+    assert actual == expected
+
+    await client.sadd(key, a)
+    expected = [True, False]
+    actual = await client.smismember(key, a, b)
+    assert actual == expected
+
+    expected = [False, True]
+    actual = await client.smismember(key, b, a)
+    assert actual == expected
+
+    expected = [True]
+    actual = await client.smismember(key, a)
+    assert actual == expected
+
+    expected = [False, True, False]
+    actual = await client.smismember(key, b, a, "nope")
+    assert actual == expected
