@@ -147,6 +147,10 @@ class MidlevelClient:
         """Implement the SMEMBERS command (https://redis.io/commands/smember)."""
         return await self.call("SMEMBERS", key)
 
+    async def smismember(self, key: str, member: str, *members: str) -> list:
+        """Implement the SMISMEMBER command (https://redis.io/commands/smismember)."""
+        return await self.call("SMISMEMBER", key, member, *members)
+
     ### String commands: https://redis.io/commands/#string ###
     async def append(self, key: str, value: str) -> bytes:
         """Implement the APPEND command (https://redis.io/commands/append)."""
