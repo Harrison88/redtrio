@@ -181,3 +181,23 @@ async def test_sinterstore(client):
     expected = 1
     actual = await client.sinterstore(destination, key, key2, key3)
     assert actual == expected
+
+
+async def test_sismember(client):
+    """It returns the proper responses for SISMEMBER."""
+    key = "midlevel_sismember_test"
+    a, b = "a", "b"
+
+    # SISMEMBER returns whether the value is an element in the set or not.
+    expected = False
+    actual = await client.sismember(key, a)
+    assert actual == expected
+
+    await client.sadd(key, a)
+    expected = True
+    actual = await client.sismember(key, a)
+    assert actual == expected
+
+    expected = False
+    actual = await client.sismember(key, b)
+    assert actual == expected
