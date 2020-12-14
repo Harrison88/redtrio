@@ -230,3 +230,23 @@ async def test_smismember(client):
     expected = [False, True, False]
     actual = await client.smismember(key, b, a, "nope")
     assert actual == expected
+
+
+async def test_smove(client):
+    """It returns the proper responses for SMOVE."""
+    key = "midlevel_smove_test"
+    dest = "midlevel_smove_test_dest"
+    a = "a"
+
+    # SMOVE returns an integer indicating whether the member was moved or not.
+    expected = 0
+    actual = await client.smove(key, dest, a)
+    assert actual == expected
+
+    await client.sadd(key, a)
+    expected = 1
+    actual = await client.smove(key, dest, a)
+    assert actual == expected
+    expected = True
+    actual = await client.sismember(dest, a)
+    assert actual == expected
