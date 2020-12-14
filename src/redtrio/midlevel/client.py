@@ -151,6 +151,10 @@ class MidlevelClient:
         """Implement the SMISMEMBER command (https://redis.io/commands/smismember)."""
         return await self.call("SMISMEMBER", key, member, *members)
 
+    async def smove(self, source: str, destination: str, member: str) -> int:
+        """Implement the SMOVE command (https://redis.io/commands/smove)."""
+        return await self.call("SMOVE", source, destination, member)
+
     ### String commands: https://redis.io/commands/#string ###
     async def append(self, key: str, value: str) -> bytes:
         """Implement the APPEND command (https://redis.io/commands/append)."""
