@@ -481,4 +481,3 @@ async def test_strlen(client):
     expected = len(value)
     actual = await client.strlen(key)
     assert actual == expected
-
