@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8']
-        redis-version: [6]
+        redis-version: [6.2-rc]
     name: Tests on Python ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@v2
