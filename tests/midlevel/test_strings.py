@@ -354,3 +354,130 @@ async def test_incrbyfloat(client):
     expected = value * 2
     actual = await client.incrbyfloat(key, value)
     assert actual == expected
+
+
+async def test_mget(client):
+    """It returns the proper responses for MGET."""
+    key = "midlevel_mget_test"
+    key2 = "midlevel_mget_test2"
+    value = "something original"
+
+    # When a key doesn't exist, None is returned.
+    expected = [None, None]
+    actual = await client.mget(key, key2)
+    assert actual == expected
+
+    # When a key does exist, its value is returned.
+    await client.mset(key, value, key2, value)
+    expected = [value.encode(), value.encode()]
+    actual = await client.mget(key, key2)
+    assert actual == expected
+
+
+async def test_mset(client):
+    """It returns the proper responses for MSET."""
+    key = "midlevel_mset_test"
+    key2 = "midlevel_mset_test2"
+    value = "a value"
+
+    # MSET never fails, and always returns b"OK".
+    expected = b"OK"
+    actual = await client.mset(key, value, key2, value)
+    assert actual == expected
+
+    # The keys both should have been set to the value.
+    expected = value.encode()
+    actual = await client.get(key)
+    actual2 = await client.get(key2)
+    assert actual == expected and actual2 == expected
+
+
+async def test_msetnx(client):
+    """It returns the proper responses for MSETNX."""
+    key = "midlevel_msetnx_test"
+    key2 = "midlevel_msetnx_test2"
+    value = "something else"
+
+    # When none of the keys already exist, the int one is returned.
+    expected = 1
+    actual = await client.msetnx(key, value, key2, value)
+    assert actual == expected
+
+    # When any of the keys already exist, the int zero is returned.
+    expected = 0
+    actual = await client.msetnx(key, value, key2, value)
+    assert actual == expected
+
+
+async def test_setbit(client):
+    """It returns the proper responses for SETBIT."""
+    key = "midlevel_setbit_test"
+    offset = 2
+
+    # When the key does not exist, all bits up to offset are initialized to 0.
+    # The bit is then set, and its previous value (0) is returned.
+    expected = 0
+    actual = await client.setbit(key, offset, 1)
+    assert actual == expected
+
+    # Set the bit to 0 now, and its previous value of 1 is returned.
+    expected = 1
+    actual = await client.setbit(key, offset, 0)
+    assert actual == expected
+
+
+async def test_setrange(client):
+    """It returns the proper responses for SETRANGE."""
+    key = "midlevel_setrange_test"
+    offset = 2
+    value = "Hello"
+
+    # When the key doesn't exist, it is initialized to zero-bytes up to offset.
+    expected = 7
+    actual = await client.setrange(key, offset, value)
+    assert actual == expected
+
+    # When the key does exist, the value is written to it, starting at offset.
+    offset = 7
+    value = ", world!"
+    expected = 15
+    actual = await client.setrange(key, offset, value)
+    assert actual == expected
+
+
+async def test_stralgo(client):
+    """It returns the proper respones for STRALGO."""
+    value = "Hello, world!"
+    value2 = "Hello, Redis!"
+
+    # When comparing two strings using the LCS algorithm, bytes are returned.
+    expected = b"Hello, d!"
+    actual = await client.stralgo("LCS", "STRINGS", value, value2)
+    assert actual == expected
+
+    # When LEN is specified, an int is returned instead.
+    expected = 9
+    actual = await client.stralgo("LCS", "STRINGS", value, value2, "LEN")
+    assert actual == expected
+
+    # When IDX is specified, a dict is returned.
+    expected = dict
+    actual = await client.stralgo("LCS", "STRINGS", value, value2, "IDX")
+    assert isinstance(actual, expected)
+
+
+async def test_strlen(client):
+    """It returns the proper responses for STRLEN."""
+    key = "midlevel_strlen_test"
+
+    # When the key does not exist, 0 is returned.
+    expected = 0
+    actual = await client.strlen(key)
+    assert actual == expected
+
+    # When the key does exist, the length of the string is returned.
+    value = "hello"
+    await client.set(key, value)
+    expected = len(value)
+    actual = await client.strlen(key)
+    assert actual == expected

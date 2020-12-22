@@ -114,6 +114,47 @@ class MidlevelClient:
         """Implement the HVALS command (https://redis.io/commands/hvals)."""
         return await self.call("HVALS", key)
 
+    ### Sets commands: https://redis.io/commands#set ###
+    async def sadd(self, key: str, *values: str) -> int:
+        """Implement the SADD command (https://redis.io/commands/sadd)."""
+        return await self.call("SADD", key, *values)
+
+    async def scard(self, key: str) -> int:
+        """Implement the SCARD command (https://redis.io/commands/scard)."""
+        return await self.call("SCARD", key)
+
+    async def sdiff(self, key: str, *keys: str) -> set:
+        """Implement the SDIFF command (https://redis.io/commands/sdiff)."""
+        return await self.call("SDIFF", key, *keys)
+
+    async def sdiffstore(self, destination: str, key: str, *keys: str) -> int:
+        """Implement the SDIFFSTORE command (https://redis.io/commands/sdiffstore)."""
+        return await self.call("SDIFFSTORE", destination, key, *keys)
+
+    async def sinter(self, key: str, *keys: str) -> set:
+        """Implement the SINTER command (https://redis.io/commands/sinter)."""
+        return await self.call("SINTER", key, *keys)
+
+    async def sinterstore(self, destination: str, key: str, *keys: str):
+        """Implement the SINTERSTORE command (https://redis.io/commands/sinterstore)."""
+        return await self.call("SINTERSTORE", destination, key, *keys)
+
+    async def sismember(self, key: str, member: str) -> bool:
+        """Implement the SISMEMBER command (https://redis.io/commands/sismember)."""
+        return await self.call("SISMEMBER", key, member)
+
+    async def smembers(self, key: str) -> set:
+        """Implement the SMEMBERS command (https://redis.io/commands/smember)."""
+        return await self.call("SMEMBERS", key)
+
+    async def smismember(self, key: str, member: str, *members: str) -> list:
+        """Implement the SMISMEMBER command (https://redis.io/commands/smismember)."""
+        return await self.call("SMISMEMBER", key, member, *members)
+
+    async def smove(self, source: str, destination: str, member: str) -> int:
+        """Implement the SMOVE command (https://redis.io/commands/smove)."""
+        return await self.call("SMOVE", source, destination, member)
+
     ### String commands: https://redis.io/commands/#string ###
     async def append(self, key: str, value: str) -> bytes:
         """Implement the APPEND command (https://redis.io/commands/append)."""
@@ -190,6 +231,18 @@ class MidlevelClient:
         """Implement the INCRBYFLOAT command (https://redis.io/commands/incrbyfloat)."""
         return float(await self.call("INCRBYFLOAT", key, str(increment)))
 
+    async def mget(self, key: str, *keys: str) -> list:
+        """Implement the MGET command (https://redis.io/commands/mget)."""
+        return await self.call("MGET", key, *keys)
+
+    async def mset(self, key: str, value: str, *more: str) -> bytes:
+        """Implement the MSET command (https://redis.io/commands/mset)."""
+        return await self.call("MSET", key, value, *more)
+
+    async def msetnx(self, key: str, value: str, *more: str) -> int:
+        """Implement the MSETNX command (https://redis.io/commands/msetnx)."""
+        return await self.call("MSETNX", key, value, *more)
+
     async def set(
         self,
         key: str,
@@ -222,3 +275,21 @@ class MidlevelClient:
             command.append("XX")
 
         return await self.call(*command)
+
+    async def setbit(self, key: str, offset: int, value: t.Literal[0, 1]) -> int:
+        """Implement the SETBIT command (https://redis.io/commands/setbit)."""
+        return await self.call("SETBIT", key, str(offset), str(value))
+
+    async def setrange(self, key: str, offset: int, value: str) -> int:
+        """Implement the SETRANGE command (https://redis.io/commands/setrange)."""
+        return await self.call("SETRANGE", key, str(offset), value)
+
+    async def stralgo(
+        self, algo: t.Literal["LCS"], *algo_args: str
+    ) -> t.Union[str, int, dict]:
+        """Implement the STRALGO command (https://redis.io/commands/stralgo)."""
+        return await self.call("STRALGO", algo, *algo_args)
+
+    async def strlen(self, key: str) -> int:
+        """Implement the STRLEN command (https://redis.io/commands/strlen)."""
+        return await self.call("STRLEN", key)
