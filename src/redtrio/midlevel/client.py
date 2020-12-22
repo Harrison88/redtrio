@@ -155,6 +155,15 @@ class MidlevelClient:
         """Implement the SMOVE command (https://redis.io/commands/smove)."""
         return await self.call("SMOVE", source, destination, member)
 
+    async def spop(
+        self, key: str, count: t.Optional[int] = None
+    ) -> t.Union[bytes, set]:
+        """Implement the SPOP command (https://redis.io/commands/spop)."""
+        command = ["SPOP", key]
+        if count is not None:
+            command.append(str(count))
+        return await self.call(*command)
+
     ### String commands: https://redis.io/commands/#string ###
     async def append(self, key: str, value: str) -> bytes:
         """Implement the APPEND command (https://redis.io/commands/append)."""

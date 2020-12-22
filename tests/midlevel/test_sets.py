@@ -250,3 +250,30 @@ async def test_smove(client):
     expected = True
     actual = await client.sismember(dest, a)
     assert actual == expected
+
+
+async def test_spop(client):
+    """It returns the proper responses for SPOP."""
+    key = "midlevel_spop_test"
+    a, b = "a", "b"
+
+    # SPOP returns a random element from the set, or None if it's nonexistent.
+    expected = None
+    actual = await client.spop(key)
+    assert actual == expected
+
+    await client.sadd(key, a)
+    expected = a.encode()
+    actual = await client.spop(key)
+    assert actual == expected
+
+    await client.sadd(key, a, b)
+    expected = {a.encode(), b.encode()}
+    actual = await client.spop(key, 2)
+    assert actual == expected
+
+    await client.sadd(key, a)
+    await client.spop(key)
+    expected = set()
+    actual = await client.smembers(key)
+    assert actual == expected
