@@ -16,7 +16,7 @@ classifiers = [
     "Framework :: Trio",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: BSD License",
-    "Programming Language :: Python :: 3.8"
+    "Programming Language :: Python :: 3.10"
 ]
 
 
@@ -25,26 +25,51 @@ python = "^3.8"
 trio = "~=0.16"
 respy3 = "^0"
 
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7"
+pytest-trio = "^0.7.0"
+pytest-cov = "^3"
+coverage = {extras = ["toml"], version = "^6"}
+codecov = "^2"
+
+[tool.poetry.group.lint]
+optional = true
+
+[tool.poetry.group.lint.dependencies]
+black = "^22"
+flake8 = "^4"
+flake8-bandit = "^3"
+flake8-black = "^0"
+flake8-bugbear = "^22"
+flake8-import-order = "^0"
+flake8-docstrings = "^1"
+darglint = "^1"
+
+[tool.poetry.group.types]
+optional = true
+
+[tool.poetry.group.types.dependencies]
+mypy = "^0"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^5"
+sphinx-autodoc-typehints = "^1"
+sphinx-autoapi = "^1"
+
+[tool.poetry.group.safety]
+optional = true
+
+[tool.poetry.group.safety.dependencies]
+safety = "^1"
+
 [tool.poetry.dev-dependencies]
-black = "^19.10b0"
-mypy = "^0.780"
-pytest = "^5.4.3"
-pytest-trio = "^0.6.0"
-coverage = {extras = ["toml"], version = "^5.1"}
-pytest-cov = "^2.10.0"
-rope = "^0.17.0"
-sphinx = "^3.1.1"
-flake8 = "^3.8.3"
-flake8-bandit = "^2.1.2"
-flake8-black = "^0.2.0"
-flake8-bugbear = "^20.1.4"
-flake8-import-order = "^0.18.1"
-safety = "^1.9.0"
-flake8-docstrings = "^1.5.0"
-darglint = "^1.4.1"
-sphinx-autodoc-typehints = "^1.11.0"
-sphinx-autoapi = "^1.4.0"
-codecov = "^2.1.7"
+rope = "^1"
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
