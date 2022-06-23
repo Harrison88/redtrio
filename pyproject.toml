@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "redtrio"
-version = "0.6.2"
+version = "0.6.3"
 description = "An async (Trio) client for Redis 6+"
 authors = ["Harrison Morgan <harrison.morgan@gmail.com>"]
 license = "bsd-3-clause"
