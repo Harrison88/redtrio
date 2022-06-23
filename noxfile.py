@@ -7,7 +7,7 @@ import nox
 nox.options.sessions = "safety", "tests"
 
 
-@nox.session(python=["3.8"])
+@nox.session(python=["3.10"])
 def tests(session):
     """Run the tests."""
     args = session.posargs or ["--cov", "-m", "not e2e"]
@@ -21,7 +21,7 @@ def tests(session):
 locations = "src", "tests", "noxfile.py", "docs/conf.py"
 
 
-@nox.session(python=["3.8"])
+@nox.session(python=["3.10"])
 def lint(session):
     """Run flake8 with various plugins."""
     args = session.posargs or locations
@@ -38,7 +38,7 @@ def lint(session):
     session.run("flake8", *args)
 
 
-@nox.session(python="3.8")
+@nox.session(python="3.10")
 def safety(session):
     """Check dependencies for security."""
     with tempfile.NamedTemporaryFile() as requirements:
@@ -55,7 +55,7 @@ def safety(session):
         session.run("safety", "check", f"--file={requirements.name}", "--full-report")
 
 
-@nox.session(python="3.8")
+@nox.session(python="3.10")
 def coverage(session):
     """Upload coverage data."""
     install_with_constraints(session, "coverage[toml]", "codecov")
@@ -63,7 +63,7 @@ def coverage(session):
     session.run("codecov", *session.posargs)
 
 
-@nox.session(python="3.8")
+@nox.session(python="3.10")
 def docs(session):
     """Build the documentation."""
     install_with_constraints(session, "sphinx", "sphinx-autoapi")
