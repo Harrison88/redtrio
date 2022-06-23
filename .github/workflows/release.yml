@@ -14,8 +14,9 @@ jobs:
     - uses: supercharge/redis-github-action@1.4.0
       with:
         redis-version: '7.0'
-    - run: pip install nox==2022.1.7
     - run: pip install poetry==1.2.0b2
-    - run: nox
+    - run: poetry install --with test,safety
+    - run: poetry run pytest --cov
+    - run: poetry export -f requirements.txt | poetry run safety check --stdin
     - run: poetry build
     - run: poetry publish --username=__token__ --password=${{ secrets.PYPI_TOKEN }}

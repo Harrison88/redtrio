@@ -15,8 +15,10 @@ jobs:
     - uses: supercharge/redis-github-action@1.4.0
       with:
         redis-version: ${{ matrix.redis-version }}
-    - run: pip install nox==2022.1.7
     - run: pip install poetry==1.2.0b2
-    - run: nox --sessions tests-3.10 coverage
+    - run: poetry install --with test
+    - run: poetry run pytest --cov
+    - run: poetry run coverage xml --fail-under=0
+    - run: poetry run codecov
       env:
         CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
