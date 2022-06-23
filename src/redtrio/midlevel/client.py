@@ -293,12 +293,6 @@ class MidlevelClient:
         """Implement the SETRANGE command (https://redis.io/commands/setrange)."""
         return await self.call("SETRANGE", key, str(offset), value)
 
-    async def stralgo(
-        self, algo: t.Literal["LCS"], *algo_args: str
-    ) -> t.Union[str, int, dict]:
-        """Implement the STRALGO command (https://redis.io/commands/stralgo)."""
-        return await self.call("STRALGO", algo, *algo_args)
-
     async def strlen(self, key: str) -> int:
         """Implement the STRLEN command (https://redis.io/commands/strlen)."""
         return await self.call("STRLEN", key)
